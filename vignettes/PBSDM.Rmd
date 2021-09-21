@@ -72,36 +72,191 @@ make_range_map(occurrences = xs[c("longitude","latitude")],
 xs_rangebagged_polygon <- rasterToPolygons(xs_rangebagged,dissolve = TRUE)
 
 #Now, we'll plot the standardized temperature raster, along with the occurrence records and the range map 
-plot(xs_rangebagged_polygon)
-plot(env[[1]], add = T)
-points(xs[c("longitude","latitude")],pch=16,cex = .1)
+plot(env[[1]],xlim=c(-150,-30),ylim=c(0,70))
+points(xs[c("longitude","latitude")],pch=16,cex = .1,col="blue")
 plot(xs_rangebagged_polygon,add=T)
 
 ```
 
 ## Working with model objects
 
-For many situations we may want more control over the models that are fit, or we may want to directly access the plug-and-play model so that we can either 1) save the model object, or 2) project the model object to another region in time or space. In these cases, the functions `fit_plug_and_play` and 'fit_density_ratio' can be used to fit models, and the functions `project_plug_and_play` and `project_density_ratio` to project them.
+For many situations we may want more control over the models that are fit, or we may want to directly access the plug-and-play model so that we can either 1) save the model object, or 2) project the model object to another region in time or space. In these cases, the functions `fit_plug_and_play` and `fit_density_ratio` can be used to fit models, and the functions `project_plug_and_play` and `project_density_ratio` to project them.
+
+For these function, users must supply the presence and background data directly.  We have included simple functions to help with this, but for most uses additional cleaning and other data processing will probably be useful.
 
 
 
 ```{r}
 
 
-#Here, we'll use the same data as before for Xanthium strumarium
+# Here, we'll use the same data as before for Xanthium strumarium.
+
+# First, we get the presence data:
+
+xs_presence <- get_env_pres(coords = xs[c("longitude","latitude")],
+                            env = env)
+
+#The returned object 'xs_presence' contains two objects:
+  # 1) xs_presence$env a matrix of environmental covariates. This is what we need for modeling.
+  # 2) xs_presence$occurrence_sp a spatialpoints object containing the coordinate data. This is useful for conducting spatially stratified cross-validation.
 
 
-#Before we fit a rangebagging model.  Here, we'll 
-fit_density_ratio()
+#Next, we'll select the background data
+xs_bg <- get_env_bg(coords = xs[c("longitude","latitude")],
+                    env = env,
+                    width = 1000000)
+
+#The returned object 'xs_bg' contains two objects:
+  # 1) xs_bg$env a matrix of environmental covariates. This is what we need for modeling.
+  # 2) xs_bg$bg_cells a vector containing the environmental raster cell IDs that are present in xs_bg$env. This is useful for mapping the results.
 
 
-fit_plug_and_play()
 
+#Now, we can fit the model.  Previously we used rangebagging, this time we'll use a simple KDE estimation
+xs_kde_kde <- fit_plug_and_play(presence = xs_presence$env,
+                                background = xs_bg$env,
+                                method = "kde")
+
+
+#The object that was returned is of the class "pnp_model", which is essentially a list of model fits and associated metadata.
+
+#To view this data on a map, we can project it to the background data we used in fitting (or we could project to a new location entirely). In either case, we use the function `project_plu_and_play`.
+
+
+xs_kde_kde_predictions <- project_plug_and_play(pnp_model = xs_kde_kde,
+                                                data = xs_bg$env)
+
+
+
+#Now we can make a template raster to store our predictions
+
+xs_kde_kde_raster <- setValues(x = env[[1]],values = NA)
+
+
+#Add our predictions to the raster
+xs_kde_kde_raster[xs_bg$bg_cells] <-  xs_kde_kde_predictions
+
+#Now, we can plot our raster
+plot(xs_kde_kde_raster,
+     xlim = c(-150,-30),
+     ylim = c(0,70))
+
+#To threshold this continuous raster to yield a binary raster
+
+xs_kde_kde_raster <- sdm_threshold(prediction_raster = xs_kde_kde_raster,
+                                   occurrence_sp = xs_presence$occurrence_sp,
+                                   quantile = 0.05,
+                                   return_binary = T)
+
+
+# As before, we'll plot this on top of temperature and occurrence records to see how well we did
+
+
+# Convert the raster to a polygon for visualization
+xs_kde_kde_polygon <- rasterToPolygons(xs_kde_kde_raster,
+                                       dissolve = TRUE)
+
+plot(env[[1]],
+     xlim = c(-150,-30),
+     ylim = c(0,70))
+
+plot(xs_kde_kde_polygon,add=T)
+
+plot(xs_presence$occurrence_sp,
+     add = T,
+     pch = 16,
+     cex = .1,
+     col = "blue")
+
+
+```
+
+
+
+## Flexibility
+
+In the previous example we used Kernel Density Estimation to estimate both the presence and background distribution.  However, Plug-and-Play modeling is incredibly flexible, and allows us to mix and match any methods for density estimation. To demonstrate, in the next example we'll combine a Gaussian estimate the presence distribution and a KDe estimate of the background distribution.
+
+```{r}
+
+
+#We'll rely on the same data as last time for simplicity.
+#Since we're using different methods for estimating the presence and background distributions, we need to specify these separately:
+
+
+
+xs_gaussian_kde <- fit_plug_and_play(presence = xs_presence$env,
+                                     background = xs_bg$env,
+                                     presence_method = "gaussian",
+                                     background_method = "kde")
+
+
+xs_gaussian_kde_predictions <- project_plug_and_play(pnp_model = xs_gaussian_kde,
+                                                data = xs_bg$env)
+
+#Now, we again convert everything to a raster and then to a polygon
+
+xs_gaussian_kde_raster <- setValues(x = env[[1]],values = NA)
+xs_gaussian_kde_raster[xs_bg$bg_cells] <-  xs_gaussian_kde_predictions
+
+#Now, we can plot our raster
+plot(xs_gaussian_kde_raster,
+     xlim = c(-150,-30),
+     ylim = c(0,70))
+
+#To threshold this continuous raster to yield a binary raster
+
+xs_gaussian_kde_raster <- sdm_threshold(prediction_raster = xs_gaussian_kde_raster,
+                                   occurrence_sp = xs_presence$occurrence_sp,
+                                   quantile = 0.05,
+                                   return_binary = T)
+
+
+# As before, we'll plot this on top of temperature and occurrence records to see how well we did
+
+
+# Convert the raster to a polygon for visualization
+xs_gaussian_kde_polygon <- rasterToPolygons(xs_gaussian_kde_raster,
+                                       dissolve = TRUE)
+
+
+plot(env[[1]],
+     xlim = c(-150,-30),
+     ylim = c(0,70))
+
+plot(xs_gaussian_kde_polygon,add=T)
+
+plot(xs_presence$occurrence_sp,
+     add = T,
+     pch = 16,
+     cex = .1,
+     col = "blue")
 
 
 
 ```
 
+## Density-ratio models
+
+In addition to methods that estimate the presence and background distributions separately, the package accommodates methods that directly estimate the density ratio, including uLSIF and MaxNet.
+
+```{r}
+
+
+xs_maxnet <- fit_density_ratio(presence = xs_presence$env,
+                               background = xs_bg$env,
+                               method = "maxnet")
+
+
+xs_maxnet_predictions <- project_density_ratio(dr_model = xs_maxnet,
+                                               data = xs_bg$env)
+
+
+
+
+
+
+```
 ## References
 
 Drake, J.M. & Richards, R.L. (2018) Estimating environmental suitability. Ecosphere , 9, e02373.
