@@ -1,0 +1,21 @@
+Package: pbsdm
+Title: Presence-Background Species Distribution Modeling in a Plug-and-Play Framework.
+Version: 0.0.0.9000
+Authors@R:
+    c(
+    person(given = "Brian",
+           family = "Maitner",
+           role = c("aut", "cre"),
+           email = "bmaitner@gmail.com",
+           comment = c(ORCID = "https://orcid.org/0000-0002-2118-9880")),
+    person(given = "Cory",
+           family = "Merow",
+           role = c("aut"),
+           email = "cory.merow@gmail.com")
+           )
+Description: This package implements presence-background species distribution modeling in a plug-and-play framework.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1

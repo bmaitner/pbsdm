@@ -1,0 +1,107 @@
+---
+title: "PBSDM R package"
+author: "Brian Maitner"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This R package  implements Presence-Background Species Distribution Modeling (PBSDM) within the plug-and-play framework of Drake and Richards (2018).  By plug-and-play, we mean that the overall methodology can accommodate any method for estimating either density functions or density ratios. Users are thus able to choose from multiple methods for estimating SDMs using an evolving set of methods within one unified framework.
+
+Here, we provide a few examples on the core functionality of the PBSDM package.
+
+## Obtaining Occurrence and Climate data
+
+To start, we'll pull occurrence data for the plant species *Xanthium strumarium* from BIEN and environmental data from BioClim.
+
+```{r, fig.show='hold'}
+
+library(BIEN)
+
+xs <- BIEN_occurrence_species(species = "Xanthium strumarium",
+                              only.new.world = T)
+
+xs <- xs[xs$latitude > 10,]
+
+library(raster)
+
+env <- getData("worldclim", var = "bio", res = 10)
+
+# To make things a bit faster and easier, we'll limit ourselves to the 2 variables (mean temperature and annual precipitation)
+
+env <- env[[c("bio1","bio12")]]
+
+# And we'll rescale the variables as well
+
+env <- scale(env)
+
+# Just to take a look to make sure we didn't mess anything up
+plot(env)
+
+```
+
+
+## Simplest case
+In the simplest case, we can rely on the function `make_range_map` which takes in longitude/latitude data (in that order) along with environmental layers and makes some simple defaults decisions to return a map produce with the specified settings. This function is easy to use, but doesn't have many features.
+
+```{r, echo=FALSE, results='asis'}
+
+library(pbsdm)
+
+xs_rangebagged <- 
+make_range_map(occurrences = xs[c("longitude","latitude")],
+               env = env,
+               presence_method = "rangebagging",
+               background_method = "none",
+               background_buffer_width = 1000000)
+
+
+#Lets see what it looks like
+
+#convert to polygon for easier visualization
+xs_rangebagged_polygon <- rasterToPolygons(xs_rangebagged,dissolve = TRUE)
+
+#Now, we'll plot the standardized temperature raster, along with the occurrence records and the range map 
+plot(xs_rangebagged_polygon)
+plot(env[[1]], add = T)
+points(xs[c("longitude","latitude")],pch=16,cex = .1)
+plot(xs_rangebagged_polygon,add=T)
+
+```
+
+## Working with model objects
+
+For many situations we may want more control over the models that are fit, or we may want to directly access the plug-and-play model so that we can either 1) save the model object, or 2) project the model object to another region in time or space. In these cases, the functions `fit_plug_and_play` and 'fit_density_ratio' can be used to fit models, and the functions `project_plug_and_play` and `project_density_ratio` to project them.
+
+
+
+```{r}
+
+
+#Here, we'll use the same data as before for Xanthium strumarium
+
+
+#Before we fit a rangebagging model.  Here, we'll 
+fit_density_ratio()
+
+
+fit_plug_and_play()
+
+
+
+
+```
+
+## References
+
+Drake, J.M. & Richards, R.L. (2018) Estimating environmental suitability. Ecosphere , 9, e02373.
