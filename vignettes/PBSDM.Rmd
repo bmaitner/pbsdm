@@ -252,7 +252,15 @@ xs_maxnet_predictions <- project_density_ratio(dr_model = xs_maxnet,
                                                data = xs_bg$env)
 
 
+#Now, we again convert everything to a raster and then to a polygon
 
+xs_maxnet_raster <- setValues(x = env[[1]],values = NA)
+xs_maxnet_raster[xs_bg$bg_cells] <-  xs_maxnet_predictions
+
+#Now, we can plot our raster
+plot(xs_maxnet_raster,
+     xlim = c(-150,-30),
+     ylim = c(0,70))
 
 
 
