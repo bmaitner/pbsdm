@@ -26,7 +26,20 @@ evaluate_range_map <- function(occurrences,
                                bootstrap = "none",
                                bootstrap_reps = 100,
                                quantile = 0.05,
-                               constraint_regions = NULL){
+                               constraint_regions = NULL,
+                               width = NULL){
+
+  #Little internal function to handle nulls in method
+  robust_in <- function(element,set){
+    if(is.null(element)){
+      return(FALSE)
+    }else{
+      if(element %in% set){
+        return(TRUE)
+      }else{return(FALSE)}
+    }
+  }#end robust in
+
 
 
   # Check that methods were supplied
@@ -58,7 +71,7 @@ evaluate_range_map <- function(occurrences,
               bg_data <- get_env_bg(coords = occurrences,
                                     env = env,
                                     method = "buffer",
-                                    width = NULL,
+                                    width = width,
                                     constraint_regions = constraint_regions)
 
               #Make empty output
@@ -87,7 +100,8 @@ evaluate_range_map <- function(occurrences,
                 #Fit models
 
                 #If density ratio was supplied
-                if(method %in% c("ulsif", "rulsif")){
+                #if(method %in% c("ulsif", "rulsif")){
+                if(robust_in(element = method,set = c("ulsif","rulsif","maxnet"))){
 
                   model <- fit_density_ratio(presence = presence_data$env[which(presence_data$occurrence_sp$fold != i),],
                                              background = bg_data$env,
@@ -111,7 +125,8 @@ evaluate_range_map <- function(occurrences,
                 #Project model to background points
 
 
-                if(method %in% c("ulsif", "rulsif")){
+                #if(method %in% c("ulsif", "rulsif")){
+                if(robust_in(element = method,set = c("ulsif","rulsif","maxnet"))){
 
                   predictions <- project_density_ratio(dr_model = model,
                                                        data = bg_data$env)
@@ -248,7 +263,8 @@ evaluate_range_map <- function(occurrences,
                         #Fit models
 
                         #If density ratio was supplied
-                        if(method %in% c("ulsif", "rulsif")){
+                        #if(method %in% c("ulsif", "rulsif")){
+                        if(robust_in(element = method,set = c("ulsif","rulsif","maxnet"))){
 
                           model <- fit_density_ratio(presence = presence_data$env,
                                                      background = bg_data$env,
@@ -272,7 +288,8 @@ evaluate_range_map <- function(occurrences,
                         #Project model to background points
 
 
-                        if(method %in% c("ulsif", "rulsif")){
+                        # if(method %in% c("ulsif", "rulsif")){
+                        if(robust_in(element = method,set = c("ulsif","rulsif","maxnet"))){
 
                           predictions <- project_density_ratio(dr_model = model,
                                                                data = bg_data$env)

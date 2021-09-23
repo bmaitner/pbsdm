@@ -260,8 +260,32 @@ xs_maxnet_raster[xs_bg$bg_cells] <-  xs_maxnet_predictions
 #Now, we can plot our raster
 plot(xs_maxnet_raster,
      xlim = c(-150,-30),
-     ylim = c(0,70))
+     ylim = c(0,70),
+     main = "MaxNet")
 
+
+
+```
+
+## Model Quality
+
+To evaluate the quality of a model, we can use the function `evaluate_range_map`, which conducts 5-fold, spatially-stratified, cross-validation on fitted models. Here, we'll conduct cross-validation on a model using a Gaussian estimate of both the presence and background distributions.
+
+
+```{r}
+
+
+xs_gaussian_gaussian_fit <- evaluate_range_map(occurrences = xs[c("longitude","latitude")],
+                                          env = env,
+                                          presence_method = "gaussian",
+                                          background_method = "gaussian")
+
+
+#Rather than looking at all of the results, we'll focus on just a few:
+
+xs_gaussian_gaussian_fit$fold_results[c('testing_AUC','testing_sensitivity','testing_specificity')]
+
+#The AUC gives us an overall idea of the discriminatory ability of the model, while the sensitivity and specificity tell us how well it discriminates presence vs. background points (respectively).
 
 
 ```
