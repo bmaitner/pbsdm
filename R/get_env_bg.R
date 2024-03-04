@@ -10,6 +10,52 @@
 #' @note If supplying constraint_regions, any polygons in which the occurrences fall are considered fair game for background selection.
 #' This background selection is, however, still limited by the buffer as well.
 #' @importFrom raster intersect buffer
+#' @examples
+#'
+
+#'
+#' # load packages
+#'  library(geodata)
+#'
+#' # make temp directory
+#'
+#'  temp <- tempdir()
+#'
+#' # Get some occurrence data
+#'
+#' occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
+#'                                              new.world = T,
+#'                                              cultivated = F)
+#'
+#' # Thin down to unique occurrences
+#'
+#' occurrences <- unique(occurrences[c("longitude","latitude")])
+#'
+#' # Get bioclim data
+#'
+#' env <- worldclim_global(var = "bio",
+#'                         res = 10,
+#'                         path = temp)
+#'
+#'
+#' env <- env[[c(1,12)]]
+#'
+#' range <- BIEN::BIEN_ranges_load_species(species = "Xanthium strumarium")
+#'
+#'
+#' bg_data <- get_env_bg(coords = occurrences,
+#'                       env = env,
+#'                       method = "buffer",width = 100,
+#'                       constraint_regions = range)
+#'
+#'
+#' }
+
+
+
+
+
+
 get_env_bg <- function(coords, env, method = "buffer", width = NULL, constraint_regions = NULL) {
 
   #check for bad coords
@@ -22,90 +68,80 @@ get_env_bg <- function(coords, env, method = "buffer", width = NULL, constraint_
     message("Problematic coords")
   }
 
-  #Convert to spatialpoints
-  coords <- sp::SpatialPoints(coords = coords,
-                              proj4string = CRS(projargs = "EPSG:4326"))
+  #Convert to sf
+
+    coords <- st_as_sf(x = coords,
+                       coords = c(1,2))
+
+    st_crs(coords) <- st_crs("WGS84")
+
 
   #convert to env raster projection
-  coords <- spTransform(x = coords,
-                        CRSobj = env@crs)
+
+    coords <-
+      coords %>%
+      st_transform(crs = st_crs(env))
 
   #set buffer size based on coordinate distances if distance null
+
   if(is.null(width)){
 
-  dists <- spDists(coords)
+    dists <- st_distance(coords)
 
-    #This commented out code can be used to get max nearest-neighbor distance instead
-    # max(apply(X = spDists(coords),
-    #       MARGIN = 1,
-    #       FUN = function(x){
-    #         min(x[which(x>0)])
-    #         }
-    #       ))
+    #width <- max(dists[which(dists > 0)]) #commenting this out because I don't remember why I had that > 0 in there...
 
-    width <- max(dists[which(dists > 0)])
+    width <- max(dists) %>% as.numeric()
 
-    #Transform the distance to meters if not projected, as needed by buffer
-    if(!is.projected(coords)){width <- width*1000}
     rm(dists)
 
   }
 
-
   #make buffer
-  buff <-
-  raster::buffer(x = coords,
-         width = width)
 
-  # plot(env[[1]])
-  # plot(buff,add=TRUE)
-
+    #this is faster than st_buffer, so using this
+    buff <- terra::buffer(x = vect(coords),
+                  width = width)
 
 
   #Optionally, limit by polygons supplied
 
-  if(!is.null(constraint_regions)){
+    if(!is.null(constraint_regions)){
 
-    #convert to env raster projection
-    constraint_regions <- spTransform(x = constraint_regions,
-                          CRSobj = env@crs)
+      #convert to env raster projection
 
-    buff <- raster::intersect(x = buff,
-                           y = constraint_regions[coords,])
+        constraint_regions <-
+        constraint_regions %>%
+          st_transform(crs = st_crs(env)) %>%
+          st_make_valid()
 
-    buff <- raster::aggregate(buff)
+        suppressWarnings(
+        buff <- st_intersection(x = buff %>%
+                          st_as_sf(),
+                        y = constraint_regions[coords,])
+        )
 
-    }
-
-
-
-
-  #remove any partial NAs from buffer(since we don't want to use them)
-  buff_rast <- rasterize(y = env,
-                         x = buff)
-  buffer_cells <- which(getValues(buff_rast) == 1)
-
-  env <- do.call(rbind,
-                 raster::extract(y = buff,x = env))
-
-  na_or_not <-
-    apply(X = env,
-          MARGIN = 1,
-          FUN = function(x){
-            any(is.na(x))
-
-          }
-    )
-
-  buffer_cells <- buffer_cells[which(!na_or_not)]
-
-  env <- env[which(!na_or_not),]
+      } # end constraint region bit
 
 
-  if(dim(env)[1]!=length(buffer_cells)){stop("Something wrong with get_env_bg")}
+    env_vals  <- terra::extract(x = env,
+                   y = buff %>%
+                     vect(),
+                   cells=TRUE,
+                   ID=FALSE)
 
+    # toss and cells that have NA values
 
-  return(test <- list(env = env,
+      env_vals <- env_vals[complete.cases(env_vals),]
+
+    # output should be a (1) the environmental variables returned and (2) a vector of cell IDS in the buffers.
+
+      buffer_cells <- env_vals$cell
+
+    # remove the cell column now that it isn't needed
+
+      env_vals$cell <- NULL
+
+  return(test <- list(env = env_vals,
                       bg_cells = buffer_cells))
 
 

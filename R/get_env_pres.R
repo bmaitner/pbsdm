@@ -5,7 +5,7 @@
 #' @param env Environmental rasterstack in any projection
 #' @importFrom terra extract
 #' @importFrom sf st_as_sf st_crs st_transform
-#' @example {
+#' @examples  {
 #'
 #' # load packages
 #'  library(geodata)
