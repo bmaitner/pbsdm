@@ -68,7 +68,8 @@ get_env_pres <- function(coords, env) {
   # Get env data
 
     env_data <- extract(x = env,
-                        y = coords)
+                        y = coords,
+                        ID = FALSE)
 
   # Check for NAs
 
@@ -85,9 +86,9 @@ get_env_pres <- function(coords, env) {
 
     # Toss any NAs from both the environmental data and coordinates
 
-      env_data2 <- env_data[setdiff(x = 1:nrow(env_data),y = nas),]
+      env_data <- env_data[setdiff(x = 1:nrow(env_data),y = nas),]
 
-      coords2 <- coords[setdiff(x = 1:nrow(coords),y = nas),]
+      coords <- coords[setdiff(x = 1:nrow(coords),y = nas),]
 
     #return output
 

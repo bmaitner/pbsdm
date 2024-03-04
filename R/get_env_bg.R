@@ -117,15 +117,14 @@ get_env_bg <- function(coords, env, method = "buffer", width = NULL, constraint_
         suppressWarnings(
         buff <- st_intersection(x = buff %>%
                           st_as_sf(),
-                        y = constraint_regions[coords,])
+                        y = constraint_regions[coords,]) %>% vect()
         )
 
       } # end constraint region bit
 
 
     env_vals  <- terra::extract(x = env,
-                   y = buff %>%
-                     vect(),
+                   y = buff,
                    cells=TRUE,
                    ID=FALSE)
 
