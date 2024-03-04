@@ -107,7 +107,7 @@ fit_plug_and_play <- function(presence = NULL,
                                          replace = T),]
 
       f1[[i]] <-  do.call(what = paste('pnp_', presence_method, sep = ""),
-                          list(data = presence_sample, method = "fit"))
+                          list(data = presence_sample, method = "fit", ...))
 
     }
 
@@ -119,7 +119,7 @@ fit_plug_and_play <- function(presence = NULL,
   if(!den_bs){
 
     f0 <- do.call(what = paste('pnp_', background_method, sep = ""),
-                  list(data = background, method = "fit"))
+                  list(data = background, method = "fit", ...))
 
   }else{
 
@@ -131,7 +131,7 @@ fit_plug_and_play <- function(presence = NULL,
                                              size = bootstrap_sample_size_denominator,
                                              replace = T),]
       f0[[i]] <-  do.call(what = paste('pnp_', background_method, sep = ""),
-                          list(data = background_sample, method = "fit"))
+                          list(data = background_sample, method = "fit",...))
 
 
     }

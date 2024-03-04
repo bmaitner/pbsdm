@@ -6,6 +6,7 @@
 #' @param sigma Sigma parameter for RuLSIF. Default is the RuLSIF default.
 #' @param lambda Lambda parameter for RuLSIF. Default is the RuLSIF default.
 #' @param kernel_num kernel_number for RuLSIF. Default is the RuLSIF default.
+#' @param alpha Relative parameter.  Defaults to RuLSIF default.
 #' @param method one of either "fit" or "predict"
 #' @param object fitted object returned by a dr_... function. Only needed when method = "predict"
 #' @description dr_rulsif is an internal function for density-ratio estimation with RuLSIF

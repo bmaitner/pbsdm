@@ -1,6 +1,6 @@
 #' @name evaluate_range_map
 #' @title Evalute PBSDM range map quality
-#' @description This function uses 5-fold, spatially stratified, cross-validation to evaluate distributin model quality.
+#' @description This function uses 5-fold, spatially stratified, cross-validation to evaluate distribution model quality.
 #' @param occurrences Presence coordinates in long,lat format.
 #' @param env Environmental rasters
 #' @param method Optional. If supplied, both presence and background density estimation will use this method.
@@ -10,7 +10,7 @@
 #' "numbag" (presence function is bootstrapped),
 #' or "doublebag" (presence and background functions are bootstrapped).
 #' @param bootstrap_reps Integer.  Number of bootstrap replicates to use (default is 100)
-#' @param quantile Quantile to use for thresholding.  Default is 0.05 (5 pct training presence). Set to 0 for minimum trainin presence (MTP).
+#' @param quantile Quantile to use for thresholding.  Default is 0.05 (5 pct training presence). Set to 0 for minimum training presence (MTP).
 #' @param constraint_regions See get_env_bg documentation
 #' @param ... Additional parameters passed to internal functions.
 #' @note Either `method` or both `presence_method` and `background_method` must be supplied.

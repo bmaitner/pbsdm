@@ -5,12 +5,12 @@
 #' @param method one of either "fit" or "predict"
 #' @param object fitted object returned by a pnp_... function. Only needed when method = "predict"
 #' @param v Integer. Number of votes to use in the aggregation, default is 100.
-#' @param d Integer. Number of dimensions (i.e. covariates) to use in aggregations, defaults is 1.
+#' @param d Integer. Number of dimensions (i.e. covariates) to use in aggregations, default is 2.
 #' @param p Numeric.  Fraction of observations (i.e. occurrences) to use in each replicate aggregation. Default is 0.5
 #' @details For fitting, an object is not required (and will be ignored). For prediction, parameters v,p,and d are not needed and will be ignored.
 #' @import geometry
 #' @keywords internal
-pnp_rangebagging <- function(data, method, object = NULL, v = 100, d = 1, p = 0.5){
+pnp_rangebagging <- function(data, method, object = NULL, v = 100, d = 2, p = 0.5){
 
   #Code to check inputs
 
@@ -45,9 +45,14 @@ pnp_rangebagging <- function(data, method, object = NULL, v = 100, d = 1, p = 0.
                         replace=FALSE),]
 
         #THIS DOESNT REALLY DO ANYTHING USEFUL SINCE WE REFIT CONVULL IN FXN RB
+
         idx <- unique(as.vector(convhulln(x1, options='Pp')))
+
         endpoints <- x1[idx,]
-        models[[i]] <- list(vars=vars, endpoints=endpoints, data=unique(x1))
+
+        models[[i]] <- list(vars = vars,
+                            endpoints = endpoints,
+                            data = unique(x1))
       }
     }
 

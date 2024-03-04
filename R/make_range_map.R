@@ -18,6 +18,43 @@
 #' @export
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
 #' Current density ratio methods include: "ulsif", "rulsif",and "maxnet".
+#' @example {}
+
+# load packages
+library(geodata)
+
+# make temp directory
+
+temp <- tempdir()
+
+# Get some occurrence data
+occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
+                                             new.world = T,
+                                             cultivated = F)
+
+# Thin down to unique occurrences
+occurrences <- unique(occurrences[c("longitude","latitude")])
+
+# Get bioclim data
+
+env <- worldclim_global(var = "bio",
+                        res = 10,
+                        path = temp)
+
+
+env <- env[[c(1,12)]]
+
+make_range_map(occurrences = occurrences,
+               env = env,
+               method = "gaussian",
+               presence_method = NULL,
+               background_method = NULL,
+               bootstrap = "none",
+               bootstrap_reps = 100,
+               quantile = 0.05,
+               background_buffer_width = NULL)
+
+
 make_range_map <- function(occurrences,
                env,
                method = NULL,
