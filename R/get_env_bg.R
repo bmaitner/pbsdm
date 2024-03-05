@@ -10,9 +10,7 @@
 #' @note If supplying constraint_regions, any polygons in which the occurrences fall are considered fair game for background selection.
 #' This background selection is, however, still limited by the buffer as well.
 #' @importFrom raster intersect buffer
-#' @examples
-#'
-
+#' @examples {
 #'
 #' # load packages
 #'  library(geodata)

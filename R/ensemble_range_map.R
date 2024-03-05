@@ -1,15 +1,3 @@
-
-#ensembling function
-
-  #inputs:
-    # models types
-    # occs
-    # env
-
-  #output
-    #model fit stuff
-    #raster with pixels = votes
-
 #' @name ensemble_range_map
 #' @title Generate ensemble predictions from PBSDM range maps
 #' @description This function evaluates model quality and creates an ensemble of the model outputs.
@@ -29,49 +17,47 @@
 #' @note Either `method` or both `presence_method` and `background_method` must be supplied.
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
 #' Current density ratio methods include: "ulsif", "rulsif".
+#' @return List object containing elements (1) spatRaster ensemble layer showing the proportion of maps that are inclued in the range across the ensemble,
+#'  (2) spatRasters for individual models, and (3) model quality information.
 #' @importFrom pROC roc auc
 #' @export
-#' @example{}
+#' @examples {
 #'
-
-
-
-
-method = c("gaussian","kde","rangebagging")
-
-# load packages
-library(geodata)
-
-# make temp directory
-
-temp <- tempdir()
-
-# Get some occurrence data
-  occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
-                                      new.world = T,
-                                      cultivated = F)
-
-# Thin down to unique occurrences
-  occurrences <- unique(occurrences[c("longitude","latitude")])
-
-# Get bioclim data
-
-env <- worldclim_global(var = "bio",
-                        res = 10,
-                        path = temp)
-
-
-env <- env[[c(1,12)]]
-
-
-test <- ensemble_range_map(occurrences = occurrences,
-                   env = env,
-                   presence_method = "kde",
-                   background_method = "kde",
-                   bootstrap = "numbag",
-                   bootstrap_reps = 10)
-
-
+#'# load packages
+#'  library(geodata)
+#'
+#'  # make temp directory
+#'
+#'  temp <- tempdir()
+#'
+#'  # Get some occurrence data
+#'
+#'  occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
+#'                                               new.world = T,
+#'                                               cultivated = F)
+#'
+#'
+#'  # Thin down to unique occurrences
+#'  occurrences <- unique(occurrences[c("longitude","latitude")])
+#'
+#'  # Get bioclim data
+#'
+#'  env <- worldclim_global(var = "bio",
+#'                          res = 10,
+#'                          path = temp)
+#'
+#'
+#'  env <- env[[c(1,12)]]
+#'
+#'  ensemble <- ensemble_range_map(occurrences = occurrences,
+#'                                 env = env,
+#'                                 method = NULL,
+#'                                 presence_method = c("gaussian", "rangebagging"),
+#'                                 background_method = "gaussian",
+#'                                 bootstrap = "numbag",
+#'                                 bootstrap_reps = 10,
+#'                                 quantile = 0.05)
+#' }
 ensemble_range_map <- function(occurrences,
                                env,
                                method = NULL,
@@ -138,11 +124,11 @@ ensemble_range_map <- function(occurrences,
 
     if(i == 1){
 
-      map_stack <- stack(map_i)
+      map_stack <- map_i
 
     }else{
 
-      map_stack <- stack(map_stack,map_i)
+      map_stack <- c(map_stack,map_i)
 
     }
 
@@ -150,11 +136,24 @@ ensemble_range_map <- function(occurrences,
     }#for loop
 
 
+    # Make ensemble map (fraction of votes)
 
+      ensemble <- app(x = map_stack,
+                      fun=function(x){!is.na(x)})
+
+      ensemble <- sum(ensemble)/nlyr(map_stack)
+
+      names(ensemble) <- "consensus"
+
+    output <- list( ensemble,
+                    map_stack,
+                    quality_list)
+
+    names(output) <- c("ensemble_map",
+                       "map_stack",
+                       "quality_list" )
+
+
+    return(output)
 
 }#end fx
-
-
-
-###################
-

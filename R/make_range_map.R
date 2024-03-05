@@ -13,12 +13,13 @@
 #' @param quantile Quantile to use for thresholding.  Default is 0.05 (5 pct training presence). Set to 0 for minimum trainin presence (MTP), set to NULL to return continuous raster.
 #' @param background_buffer_width The width (in m for unprojected rasters and map units for projected rasters) of the buffer to use for background data.
 #' Defaults to NULL, which will take the maximum distance between occurrence records.
+#' @param verbose Logical. If TRUE, prints progress messages.
 #' @param ... Additional parameters passed to internal functions.
 #' @note Either `method` or both `presence_method` and `background_method` must be supplied.
 #' @export
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
 #' Current density ratio methods include: "ulsif", "rulsif",and "maxnet".
-#' @example {
+#' @examples {
 #'
 #' # load packages
 #'    library(geodata)
@@ -66,7 +67,9 @@ make_range_map <- function(occurrences,
                bootstrap = "none",
                bootstrap_reps = 100,
                quantile = 0.05,
-               background_buffer_width = NULL){
+               background_buffer_width = NULL,
+               verbose = FALSE,
+               ...){
 
 
   #Little internal function to handle nulls in method
@@ -117,7 +120,7 @@ make_range_map <- function(occurrences,
 
     #Project model to background points
 
-    print("starting predictions")
+    if(verbose){message("starting predictions")}
 
     if(robust_in(element = method,set = c("ulsif", "rulsif","maxnet"))){
 
@@ -132,32 +135,32 @@ make_range_map <- function(occurrences,
 
     }
 
-    print("converting predictions to raster")
+    if(verbose){message("converting predictions to raster")}
 
     #Convert predictions to a raster
 
-      print("making empty raster")
+    if(verbose){message("making empty raster")}
 
         prediction_raster <- env[[1]]
         values(prediction_raster) <- NA
 
-      print("assigning values")
+        message("assigning values")
 
         prediction_raster[bg_data$bg_cells] <- predictions
 
+        names(prediction_raster) <- "suitability"
+        varnames(prediction_raster) <- "suitability"
+
     #Apply thresholding
 
-    print("thresholding predictions")
+    if(verbose){message("thresholding predictions")}
 
     if(!is.null(quantile)){
 
       prediction_raster <- sdm_threshold(prediction_raster = prediction_raster,
-                                         occurrence_sp = presence_data$occurrence_sp,
+                                         occurrence_sf = presence_data$occurrence_sf,
                                          quantile = quantile)
     }
-
-
-
 
     return(prediction_raster)
 
