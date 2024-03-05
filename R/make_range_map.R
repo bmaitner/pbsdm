@@ -18,43 +18,46 @@
 #' @export
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
 #' Current density ratio methods include: "ulsif", "rulsif",and "maxnet".
-#' @example {}
-
-# load packages
-library(geodata)
-
-# make temp directory
-
-temp <- tempdir()
-
-# Get some occurrence data
-occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
-                                             new.world = T,
-                                             cultivated = F)
-
-# Thin down to unique occurrences
-occurrences <- unique(occurrences[c("longitude","latitude")])
-
-# Get bioclim data
-
-env <- worldclim_global(var = "bio",
-                        res = 10,
-                        path = temp)
-
-
-env <- env[[c(1,12)]]
-
-make_range_map(occurrences = occurrences,
-               env = env,
-               method = "gaussian",
-               presence_method = NULL,
-               background_method = NULL,
-               bootstrap = "none",
-               bootstrap_reps = 100,
-               quantile = 0.05,
-               background_buffer_width = NULL)
-
-
+#' @example {
+#'
+#' # load packages
+#'    library(geodata)
+#'
+#'    # make temp directory
+#'
+#'    temp <- tempdir()
+#'
+#'    # Get some occurrence data
+#'    occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
+#'                                                 new.world = T,
+#'                                                 cultivated = F)
+#'
+#'    # Thin down to unique occurrences
+#'    occurrences <- unique(occurrences[c("longitude","latitude")])
+#'
+#'    # Get bioclim data
+#'
+#'    env <- worldclim_global(var = "bio",
+#'                            res = 10,
+#'                            path = temp)
+#'
+#'
+#'    env <- env[[c(1,12)]]
+#'
+#'    map <- make_range_map(occurrences = occurrences,
+#'                          env = env,
+#'                          method = "gaussian",
+#'                          presence_method = NULL,
+#'                          background_method = NULL,
+#'                          bootstrap = "none",
+#'                          bootstrap_reps = 100,
+#'                          quantile = 0.05,
+#'                          background_buffer_width = 100000)
+#'
+#'    plot(map)
+#'
+#'
+#' }
 make_range_map <- function(occurrences,
                env,
                method = NULL,
@@ -67,6 +70,7 @@ make_range_map <- function(occurrences,
 
 
   #Little internal function to handle nulls in method
+
       robust_in <- function(element,set){
         if(is.null(element)){
           return(FALSE)
@@ -87,9 +91,6 @@ make_range_map <- function(occurrences,
                           method = "buffer",
                           width = background_buffer_width)
 
-    # test <- setValues(x = env[[1]],NA)
-    # test[bg_data$bg_cells]<-1
-    # plot(test)
 
   #If density ratio was supplied
     if(robust_in(element = method,set = c("ulsif", "rulsif","maxnet"))){
@@ -137,19 +138,19 @@ make_range_map <- function(occurrences,
 
       print("making empty raster")
 
-      suppressWarnings(prediction_raster <- setValues(env[[1]],
-                                                      values = NA))
-      # prediction_raster <- setValues(env[[1]],
-      #                     values = NA)
-      #
-      print("assigning values")
-      prediction_raster[bg_data$bg_cells] <- predictions
+        prediction_raster <- env[[1]]
+        values(prediction_raster) <- NA
 
+      print("assigning values")
+
+        prediction_raster[bg_data$bg_cells] <- predictions
 
     #Apply thresholding
 
     print("thresholding predictions")
+
     if(!is.null(quantile)){
+
       prediction_raster <- sdm_threshold(prediction_raster = prediction_raster,
                                          occurrence_sp = presence_data$occurrence_sp,
                                          quantile = quantile)
@@ -161,3 +162,5 @@ make_range_map <- function(occurrences,
     return(prediction_raster)
 
 }
+
+
