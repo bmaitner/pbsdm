@@ -50,13 +50,11 @@
 #'
 #'
 #' }
-
-
-
-
-
-
-get_env_bg <- function(coords, env, method = "buffer", width = NULL, constraint_regions = NULL) {
+get_env_bg <- function(coords,
+                       env,
+                       method = "buffer",
+                       width = NULL,
+                       constraint_regions = NULL) {
 
   #check for bad coords
 
