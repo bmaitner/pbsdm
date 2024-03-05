@@ -38,9 +38,6 @@
 #'                         env = env)
 #'
 #' }
-
-
-
 get_env_pres <- function(coords, env) {
 
   #check for bad coords
@@ -93,7 +90,7 @@ get_env_pres <- function(coords, env) {
     #return output
 
     return(out <- list(env = env_data,
-                        occurrence_sp = coords))
+                        occurrence_sf = coords))
 
 
 }# end fx
