@@ -17,7 +17,53 @@
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
 #' Current density ratio methods include: "ulsif", "rulsif".
 #' @importFrom pROC roc auc
+#' @import terra
+#' @import sf
 #' @export
+#' @examples{
+#'
+#'
+# load packages
+#'  library(geodata)
+#'
+#'# make temp directory
+#'
+#'  temp <- tempdir()
+#'
+#'# Get some occurrence data
+#'
+#'  occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
+#'                                               new.world = T,
+#'                                               cultivated = F)
+#'
+#'# Thin down to unique occurrences
+#'
+#'  occurrences <- unique(occurrences[c("longitude","latitude")])
+#'
+#'# Get bioclim data
+#'
+#'  env <- worldclim_global(var = "bio",
+#'                          res = 10,
+#'                          path = temp)
+#'
+#'  env <- env[[c(1,12)]]
+#'
+#'# Evaluate a gaussian/gaussian model calculated with the numbag approach using 10 bootstrap replicates.
+#'
+#'  evaluate_range_map(occurrences = occurrences,
+#'                     env = env,
+#'                     method = NULL,
+#'                     presence_method = "gaussian",
+#'                     background_method = "gaussian",
+#'                     bootstrap = "numbag",
+#'                     bootstrap_reps = 10,
+#'                     quantile = 0.05,
+#'                     constraint_regions = NULL,
+#'                     width = NULL)
+#'
+#'
+#'
+#' }
 evaluate_range_map <- function(occurrences,
                                env,
                                method = NULL,
@@ -48,9 +94,10 @@ evaluate_range_map <- function(occurrences,
     stop("Please supply either (1) method, or (2) both presence_method and background_method")
   }
 
+  if(is.null(method)){method <- NA}
 
   # Assign methods if needed
-  if(!is.null(method)) {
+  if(!is.na(method)) {
 
     presence_method <- method
     background_method <- method
@@ -61,10 +108,12 @@ evaluate_range_map <- function(occurrences,
                                             env = env)
 
               #Make template
-              template <- setValues(x = env[[1]],values = 1:ncell(env[[1]]))
+              template <- env[[1]]
+              template[1:ncell(template)] <- 1:ncell(template)
+
 
               #Divide data into folds
-              presence_data$occurrence_sp <- stratify_spatial(occurrence_sp = presence_data$occurrence_sp,
+              presence_data$occurrence_sf <- stratify_spatial(occurrence_sf = presence_data$occurrence_sf,
                                                 nfolds = NULL,
                                                 nsubclusters = NULL)
 
@@ -75,7 +124,7 @@ evaluate_range_map <- function(occurrences,
                                     constraint_regions = constraint_regions)
 
               #Make empty output
-              out <- data.frame(fold = 1:length(unique(presence_data$occurrence_sp$fold)),
+              out <- data.frame(fold = 1:length(unique(presence_data$occurrence_sf$fold)),
                                 training_AUC = NA,
                                 training_pAUC_specificity = NA,
                                 training_pAUC_sensitivity = NA,
@@ -95,7 +144,7 @@ evaluate_range_map <- function(occurrences,
                                      full_correlation = NA)
 
               #iterate through folds
-              for(i in 1:length(unique(presence_data$occurrence_sp$fold))){
+              for(i in 1:length(unique(presence_data$occurrence_sf$fold))){
 
                 #Fit models
 
@@ -103,14 +152,14 @@ evaluate_range_map <- function(occurrences,
                 #if(method %in% c("ulsif", "rulsif")){
                 if(robust_in(element = method,set = c("ulsif","rulsif","maxnet"))){
 
-                  model <- fit_density_ratio(presence = presence_data$env[which(presence_data$occurrence_sp$fold != i),],
+                  model <- fit_density_ratio(presence = presence_data$env[which(presence_data$occurrence_sf$fold != i),],
                                              background = bg_data$env,
                                              method = method)
 
                 }else{
 
 
-                  model <- fit_plug_and_play(presence = presence_data$env[which(presence_data$occurrence_sp$fold != i),],
+                  model <- fit_plug_and_play(presence = presence_data$env[which(presence_data$occurrence_sf$fold != i),],
                                              background = bg_data$env,
                                              method = method,
                                              presence_method = presence_method,
@@ -126,6 +175,7 @@ evaluate_range_map <- function(occurrences,
 
 
                 #if(method %in% c("ulsif", "rulsif")){
+
                 if(robust_in(element = method,set = c("ulsif","rulsif","maxnet"))){
 
                   predictions <- project_density_ratio(dr_model = model,
@@ -146,19 +196,33 @@ evaluate_range_map <- function(occurrences,
 
                 prediction_raster[bg_data$bg_cells] <- predictions
 
+                names(prediction_raster) <- "suitability"
+                varnames(prediction_raster) <- "suitability"
+
 
                 #Model performance stats on withheld data
                   # AUC
                     #first, need to a dataframe describing suitability scores and whether they contain presences
 
 
-                    fold_presence_cells <- unique(extract(x = template,
-                            y = presence_data$occurrence_sp[which(presence_data$occurrence_sp$fold != i),]))
+                    fold_presence_cells <-
+                      extract(x = template,
+                              y = presence_data$occurrence_sf[which(presence_data$occurrence_sf$fold != i),],
+                              ID = FALSE) %>%
+                      unique() %>%
+                      unlist() %>%
+                      as.numeric()
 
-                    fold_pseudoabscence_cells <- setdiff(x = bg_data$bg_cells,fold_presence_cells)
+                    fold_pseudoabscence_cells <- setdiff(x = bg_data$bg_cells,
+                                                         y = fold_presence_cells)
 
-                    fold_testing_cells <- unique(extract(x = template,
-                                                          y = presence_data$occurrence_sp[which(presence_data$occurrence_sp$fold == i),]))
+                    fold_testing_cells <-
+                      extract(x = template,
+                              y = presence_data$occurrence_sf[which(presence_data$occurrence_sf$fold == i),],
+                              ID = FALSE) %>%
+                      unique() %>%
+                      unlist() %>%
+                      as.numeric()
 
                     #length(bg_data$bg_cells) == length(fold_presence_cells)+length(fold_pseudoabscence_cells)
 
@@ -182,7 +246,7 @@ evaluate_range_map <- function(occurrences,
 
                   #Training data
 
-                    training_roc_obj <- roc(response =fold_training_suitability_v_occurrence$occurrence,
+                    training_roc_obj <- roc(response = fold_training_suitability_v_occurrence$occurrence,
                                    predictor = fold_training_suitability_v_occurrence$suitability)
 
                     out$training_AUC[i] <- training_roc_obj$auc
@@ -221,9 +285,10 @@ evaluate_range_map <- function(occurrences,
 
 
                   # threshold-dependent measures of some sort?
+
                       binary_map <-
                       sdm_threshold(prediction_raster = prediction_raster,
-                              occurrence_sp = presence_data$occurrence_sp,
+                              occurrence_sf = presence_data$occurrence_sf,
                               quantile = 0.05,
                               return_binary = TRUE)
 
@@ -310,9 +375,15 @@ evaluate_range_map <- function(occurrences,
                         prediction_raster[bg_data$bg_cells] <- predictions
 
                         full_suitability_v_occurrence <-
-                          rbind(data.frame(suitability = prediction_raster[presence_data$occurrence_sp],
+                          rbind(data.frame(suitability = extract(x = prediction_raster,
+                                                                 y = presence_data$occurrence_sf,
+                                                                 ID = FALSE)%>%
+                                             unlist() %>%
+                                             as.vector(),
                                            occurrence = 1),
-                                data.frame(suitability = prediction_raster[bg_data$bg_cells],
+                                data.frame(suitability = prediction_raster[bg_data$bg_cells]%>%
+                                             unlist()%>%
+                                             as.vector(),
                                            occurrence = 0))
 
                         full_roc_obj <- roc(response = full_suitability_v_occurrence$occurrence,
@@ -345,8 +416,14 @@ evaluate_range_map <- function(occurrences,
               }#i loop
 
 
-              return(list(fold_results = out, overall_results = out_full))
+              return(list(fold_results = out,
+                          overall_results = out_full))
 
 
 
             }#end fx
+
+
+
+
+

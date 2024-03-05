@@ -31,8 +31,10 @@ fit_plug_and_play <- function(presence = NULL,
   }
 
 
+  if(is.null(method)){method <- NA}
+
   # Assign methods if needed
-  if(!is.null(method)) {
+  if(!is.na(method)) {
 
     presence_method <- method
     background_method <- method
