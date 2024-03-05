@@ -4,10 +4,10 @@
 \alias{stratify_spatial}
 \title{Split data for k-fold spatially stratified cross validation}
 \usage{
-stratify_spatial(occurrence_sp, nfolds = NULL, nsubclusters = NULL)
+stratify_spatial(occurrence_sf, nfolds = NULL, nsubclusters = NULL)
 }
 \arguments{
-\item{occurrence_sp}{a SpatialPoints or SpatialPointsDataFrame object}
+\item{occurrence_sf}{a sf object containing occurrence points}
 
 \item{nfolds}{number of desired output folds. Default value of NULL makes a reasonable guess based on sample size.}
 

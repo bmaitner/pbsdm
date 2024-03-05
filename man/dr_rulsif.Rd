@@ -28,6 +28,8 @@ dr_rulsif(
 
 \item{lambda}{Lambda parameter for RuLSIF. Default is the RuLSIF default.}
 
+\item{alpha}{Relative parameter.  Defaults to RuLSIF default.}
+
 \item{kernel_num}{kernel_number for RuLSIF. Default is the RuLSIF default.}
 
 \item{method}{one of either "fit" or "predict"}

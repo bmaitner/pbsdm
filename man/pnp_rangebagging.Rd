@@ -4,7 +4,7 @@
 \alias{pnp_rangebagging}
 \title{Internal function for rangebagging in plug-and-play SDMs.}
 \usage{
-pnp_rangebagging(data, method, object = NULL, v = 100, d = 1, p = 0.5)
+pnp_rangebagging(data, method, object = NULL, v = 100, d = 2, p = 0.5)
 }
 \arguments{
 \item{data}{dataframe of covariates}
@@ -15,7 +15,7 @@ pnp_rangebagging(data, method, object = NULL, v = 100, d = 1, p = 0.5)
 
 \item{v}{Integer. Number of votes to use in the aggregation, default is 100.}
 
-\item{d}{Integer. Number of dimensions (i.e. covariates) to use in aggregations, defaults is 1.}
+\item{d}{Integer. Number of dimensions (i.e. covariates) to use in aggregations, default is 2.}
 
 \item{p}{Numeric.  Fraction of observations (i.e. occurrences) to use in each replicate aggregation. Default is 0.5}
 }

@@ -4,12 +4,14 @@
 \alias{pnp_kde}
 \title{Internal function for fitting KDE distributions in plug-and-play SDMs.}
 \usage{
-pnp_kde(data, method, object = NULL)
+pnp_kde(data, method, bwmethod = "normal-reference", object = NULL, ...)
 }
 \arguments{
 \item{data}{dataframe of covariates}
 
 \item{method}{one of either "fit" or "predict"}
+
+\item{bwmethod}{Bandwidth method to use.  One of 'normal-reference' (the default),'cv.ml', or 'cv.ls'}
 
 \item{object}{fitted object returned by a pnp_... function. Only needed when method = "predict"}
 }

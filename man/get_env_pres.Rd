@@ -14,3 +14,38 @@ get_env_pres(coords, env)
 \description{
 This function extracts presence data at known presence records.
 }
+\examples{
+ {
+
+# load packages
+ library(geodata)
+
+# make temp directory
+
+ temp <- tempdir()
+
+# Get some occurrence data
+
+occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
+                                             new.world = T,
+                                             cultivated = F)
+
+# Thin down to unique occurrences
+
+occurrences <- unique(occurrences[c("longitude","latitude")])
+
+# Get bioclim data
+
+env <- worldclim_global(var = "bio",
+                        res = 10,
+                        path = temp)
+
+
+env <- env[[c(1,12)]]
+
+
+env_pres <- get_env_pres(coords = occurrences,
+                        env = env)
+
+}
+}

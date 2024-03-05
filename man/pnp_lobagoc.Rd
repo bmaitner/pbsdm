@@ -23,6 +23,6 @@ pnp_lobagoc(data, method, object = NULL, v = 100, nu = 0.01, sigma = NULL)
 This function both fits lobgaoc distributions and projects those distributions to new covariates..
 }
 \details{
-For fitting, an object is not required (and will be ignored). For prediction, parameters v,p,and d are not needed and will be ignored.
+For fitting, an object is not required (and will be ignored). For prediction, parameters v,nu,and sigma are not needed and will be ignored.
 }
 \keyword{internal}

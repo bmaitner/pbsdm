@@ -6,7 +6,7 @@
 \usage{
 sdm_threshold(
   prediction_raster,
-  occurrence_sp,
+  occurrence_sf,
   quantile = 0.05,
   return_binary = TRUE
 )
@@ -14,7 +14,7 @@ sdm_threshold(
 \arguments{
 \item{prediction_raster}{Raster containing continuous predictions of "suitability" to be thresholded}
 
-\item{occurrence_sp}{A spatialpoints object containing presence location. in the projection of the prediciton raster}
+\item{occurrence_sf}{A sf object containing presence locations. In the projection of the prediciton raster}
 
 \item{quantile}{Numeric between 0 and 1. Quantile to use for thresholding (defaults to 0.05).  Set to 0 for minimum training presence.}
 

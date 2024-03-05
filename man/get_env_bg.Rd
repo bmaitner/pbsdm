@@ -32,3 +32,43 @@ This function extracts background data around known presence records.
 If supplying constraint_regions, any polygons in which the occurrences fall are considered fair game for background selection.
 This background selection is, however, still limited by the buffer as well.
 }
+\examples{
+{
+
+# load packages
+ library(geodata)
+
+# make temp directory
+
+ temp <- tempdir()
+
+# Get some occurrence data
+
+occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
+                                             new.world = T,
+                                             cultivated = F)
+
+# Thin down to unique occurrences
+
+occurrences <- unique(occurrences[c("longitude","latitude")])
+
+# Get bioclim data
+
+env <- worldclim_global(var = "bio",
+                        res = 10,
+                        path = temp)
+
+
+env <- env[[c(1,12)]]
+
+range <- BIEN::BIEN_ranges_load_species(species = "Xanthium strumarium")
+
+
+bg_data <- get_env_bg(coords = occurrences,
+                      env = env,
+                      method = "buffer",width = 100,
+                      constraint_regions = range)
+
+
+}
+}

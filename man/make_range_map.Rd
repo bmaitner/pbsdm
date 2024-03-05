@@ -12,7 +12,10 @@ make_range_map(
   background_method = NULL,
   bootstrap = "none",
   bootstrap_reps = 100,
-  quantile = 0.05
+  quantile = 0.05,
+  background_buffer_width = NULL,
+  verbose = FALSE,
+  ...
 )
 }
 \arguments{
@@ -34,6 +37,11 @@ or "doublebag" (presence and background functions are bootstrapped).}
 
 \item{quantile}{Quantile to use for thresholding.  Default is 0.05 (5 pct training presence). Set to 0 for minimum trainin presence (MTP), set to NULL to return continuous raster.}
 
+\item{background_buffer_width}{The width (in m for unprojected rasters and map units for projected rasters) of the buffer to use for background data.
+Defaults to NULL, which will take the maximum distance between occurrence records.}
+
+\item{verbose}{Logical. If TRUE, prints progress messages.}
+
 \item{...}{Additional parameters passed to internal functions.}
 }
 \description{
@@ -41,8 +49,50 @@ This function produces range maps using plug-and-play modeling with either prese
 }
 \details{
 Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
-Current density ratio methods include: "ulsif", "rulsif".
+Current density ratio methods include: "ulsif", "rulsif",and "maxnet".
 }
 \note{
 Either \code{method} or both \code{presence_method} and \code{background_method} must be supplied.
+}
+\examples{
+{
+
+# load packages
+   library(geodata)
+
+   # make temp directory
+
+   temp <- tempdir()
+
+   # Get some occurrence data
+   occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
+                                                new.world = T,
+                                                cultivated = F)
+
+   # Thin down to unique occurrences
+   occurrences <- unique(occurrences[c("longitude","latitude")])
+
+   # Get bioclim data
+
+   env <- worldclim_global(var = "bio",
+                           res = 10,
+                           path = temp)
+
+
+   env <- env[[c(1,12)]]
+
+   map <- make_range_map(occurrences = occurrences,
+                         env = env,
+                         method = "gaussian",
+                         presence_method = NULL,
+                         background_method = NULL,
+                         bootstrap = "none",
+                         bootstrap_reps = 100,
+                         quantile = 0.05,
+                         background_buffer_width = 100000)
+
+   plot(map)
+
+
+}
 }
