@@ -14,20 +14,22 @@ sdm_threshold <- function(prediction_raster,
                           return_binary = TRUE){
 
   predictions_at_occurrences <- extract(y = occurrence_sp,
-                                        x = prediction_raster)
+                                        x = prediction_raster,
+                                        ID = FALSE)
 
   threshold <- stats::quantile(x = predictions_at_occurrences,
                                probs = quantile,
                                na.rm = T)
 
+
   if(return_binary){
 
-    prediction_raster <- prediction_raster >= threshold
-    prediction_raster[prediction_raster == 0] <- NA
+    prediction_raster[prediction_raster < threshold] <- NA
+    prediction_raster[prediction_raster >= threshold] <- 1
 
   }else{
 
-    prediction_raster[which(getValues(prediction_raster) < threshold)] <- NA
+    prediction_raster[prediction_raster < threshold] <- NA
 
   }
 
