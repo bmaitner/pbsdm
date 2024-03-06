@@ -9,7 +9,7 @@
 #' @returns A list containing 1) the background data, 2) the cell indices for which the background was taken
 #' @note If supplying constraint_regions, any polygons in which the occurrences fall are considered fair game for background selection.
 #' This background selection is, however, still limited by the buffer as well.
-#' @import terra
+#' @importFrom  terra buffer vect extract
 #' @importFrom stats complete.cases
 #' @export
 #' @examples {
@@ -97,7 +97,7 @@ get_env_bg <- function(coords,
   #make buffer
 
     #this is faster than st_buffer, so using this
-    buff <- terra::buffer(x = vect(coords),
+    buff <- buffer(x = vect(coords),
                   width = width)
 
 
@@ -121,7 +121,7 @@ get_env_bg <- function(coords,
       } # end constraint region bit
 
 
-    env_vals  <- terra::extract(x = env,
+    env_vals  <- extract(x = env,
                    y = buff,
                    cells=TRUE,
                    ID=FALSE)

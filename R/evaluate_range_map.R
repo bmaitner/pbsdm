@@ -19,7 +19,7 @@
 #' Current density ratio methods include: "ulsif", "rulsif".
 #' @importFrom pROC roc auc
 #' @importFrom stats cor
-#' @import terra
+#' @importFrom terra setValues extract
 #' @import sf
 #' @export
 #' @examples{
@@ -91,8 +91,8 @@ evaluate_range_map <- function(occurrences,
   }#end robust in
 
 
-
   # Check that methods were supplied
+
   if(is.null(method) & (is.null(presence_method) &
                         is.null(background_method))) {
     stop("Please supply either (1) method, or (2) both presence_method and background_method")
@@ -107,11 +107,15 @@ evaluate_range_map <- function(occurrences,
     background_method <- method
 
   }
-              #Note that this is overkill, since we don't need the presence data, just the spatialpoints file, but it prevents code duplication.
+
+    # Note that this is overkill, since we don't need the presence data, just the sf file, but it prevents code duplication.
+
               presence_data <- get_env_pres(coords = occurrences,
                                             env = env)
 
-              #Make template
+
+          # Make template
+
               template <- env[[1]]
               template[1:ncell(template)] <- 1:ncell(template)
 
@@ -127,7 +131,8 @@ evaluate_range_map <- function(occurrences,
                                     width = background_buffer_width,
                                     constraint_regions = constraint_regions)
 
-              #Make empty output
+              # Make empty output
+
               out <- data.frame(fold = 1:length(unique(presence_data$occurrence_sf$fold)),
                                 training_AUC = NA,
                                 training_pAUC_specificity = NA,
@@ -195,6 +200,7 @@ evaluate_range_map <- function(occurrences,
                 }
 
                 #Convert predictions to a raster
+
                 prediction_raster <- setValues(env[[1]],
                                                values = NA)
 
