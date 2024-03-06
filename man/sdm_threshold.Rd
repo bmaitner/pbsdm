@@ -26,4 +26,3 @@ This function thresholds a continuous "suitability" raster to produce a binary p
 \author{
 Cecina Babich Morrow (modified by Brian Maitner)
 }
-\keyword{internal}

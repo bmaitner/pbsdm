@@ -37,5 +37,7 @@ Imports:
 Suggests:
   geodata,
   BIEN,
-  ggplot2
+  ggplot2,
+  tidyterra,
+  knitr
           

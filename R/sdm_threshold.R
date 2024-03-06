@@ -5,7 +5,7 @@
 #' @param occurrence_sf A sf object containing presence locations. In the projection of the prediciton raster
 #' @param quantile Numeric between 0 and 1. Quantile to use for thresholding (defaults to 0.05).  Set to 0 for minimum training presence.
 #' @param return_binary LOGICAL. Should the raster returned be binary (presence/absence)?  If FALSE, predicted presenced will retain their 'suitability" scores.
-#' @keywords internal
+#' @export
 #' @importFrom stats quantile
 #' @author Cecina Babich Morrow (modified by Brian Maitner)
 sdm_threshold <- function(prediction_raster,
