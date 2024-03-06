@@ -4,15 +4,15 @@
 \alias{stratify_random}
 \title{Split data for k-fold spatially stratified cross validation}
 \usage{
-stratify_random(occurrence_sp, nfolds = NULL)
+stratify_random(occurrence_sf, nfolds = NULL)
 }
 \arguments{
-\item{occurrence_sp}{a SpatialPoints or SpatialPointsDataFrame object}
+\item{occurrence_sf}{a sf object containing occurrence records}
 
 \item{nfolds}{number of desired output folds.}
 }
 \value{
-Returns a SpatialPoints dataframe with the data.frame containing fold designation for each point.
+Returns a sf dataframe containing fold designation for each point.
 }
 \description{
 Splitting tool for cross-validation

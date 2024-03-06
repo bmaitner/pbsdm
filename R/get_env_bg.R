@@ -11,6 +11,7 @@
 #' This background selection is, however, still limited by the buffer as well.
 #' @import terra
 #' @importFrom stats complete.cases
+#' @export
 #' @examples {
 #'
 #' # load packages

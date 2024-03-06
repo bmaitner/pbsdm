@@ -27,7 +27,6 @@ Imports:
   kernlab,
   maxnet,
   mvtnorm,
-  nlme,
   np,
   pROC,
   robust,
