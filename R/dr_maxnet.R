@@ -13,6 +13,7 @@
 #' @param method one of either "fit" or "predict"
 #' @param object fitted object returned by a dr_... function. Only needed when method = "predict"
 #' @import maxnet
+#' @importFrom utils getFromNamespace
 #' @note The options f, regmult, regfun, and addSamplestobackground are only used when method == "predict",
 #' the options clamp and type are only used when method == "predict". See the much better documentation for maxnet for more details.
 #' @keywords internal
@@ -61,7 +62,7 @@ dr_maxnet <- function(presence_data = NULL,
         }
 
     #Fit model
-    ratio  <- maxnet::maxnet(p = pa_vector,
+    ratio  <- maxnet(p = pa_vector,
                              data = pa_covariates,
                              f = f,
                              regmult = regmult,
@@ -81,7 +82,9 @@ dr_maxnet <- function(presence_data = NULL,
 
   if(method == "predict"){
 
-    prediction <- maxnet:::predict.maxnet(object = object$ratio,
+    predict.maxnet <- getFromNamespace("predict.maxnet", "maxnet")
+
+    prediction <- predict.maxnet(object = object$ratio,
                                           newdata = projection_data,
                                           clamp = clamp)
 

@@ -43,23 +43,32 @@ pnp_vine <- function(data, method, object = NULL){
 ##############################################
 #' @note This version of the dvine function was modified to omit a transpose step that was causing problems with 1-dimensional data
 #' @importFrom rvinecopulib dvinecop
+#' @importFrom utils getFromNamespace
 safe_dvine <- function (x, vine, cores = 1) {
 
   stopifnot(inherits(vine, "vine_dist"))
 
-  x <- rvinecopulib:::expand_factors(x)
+  # Non-exported functions from rvinecopulib
+
+  depth <- getFromNamespace("depth", "rvinecopulib")
+  compute_pseudo_obs <- getFromNamespace("compute_pseudo_obs", "rvinecopulib")
+  dpq_marg <- getFromNamespace("dpq_marg", "rvinecopulib")
+  expand_factors <- getFromNamespace("expand_factors", "rvinecopulib")
+
+
+  x <- expand_factors(x)
 
   if (!is.null(vine$names)) {
     x <- x[, vine$names, drop = FALSE]
   }
   d <- ncol(x)
-  if (!inherits(vine, "vine") & rvinecopulib:::depth(vine$margins) ==
+  if (!inherits(vine, "vine") & depth(vine$margins) ==
       1) {
     vine$margins <- replicate(d, vine$margins, simplify = FALSE)
   }
-  margvals <- rvinecopulib:::dpq_marg(x, vine, "d")
+  margvals <- dpq_marg(x, vine, "d")
   if (!is.null(vine$copula)) {
-    u <- rvinecopulib:::compute_pseudo_obs(x, vine)
+    u <- compute_pseudo_obs(x, vine)
     vinevals <- dvinecop(u, vine$copula, cores)
   }
   else {
@@ -68,5 +77,5 @@ safe_dvine <- function (x, vine, cores = 1) {
   apply(cbind(margvals, vinevals), 1, prod)
 }
 
-
+####################
 
