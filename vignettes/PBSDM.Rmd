@@ -35,6 +35,7 @@ library(ggplot2)
 library(pbsdm)
 library(sf)
 library(terra)
+library(tidyterra)
 
 # Make a temporary directory to store climate data
 
@@ -69,8 +70,6 @@ plot(env)
 In the simplest case, we can rely on the function `make_range_map` which takes in longitude/latitude data (in that order) along with environmental layers and makes some simple defaults decisions to return a map produce with the specified settings. This function is easy to use, but doesn't have many features.
 
 ```{r, echo=FALSE, results='asis'}
-
-library(pbsdm)
 
 tv_rangebagged <- 
 make_range_map(occurrences = tv[c("longitude","latitude")],
