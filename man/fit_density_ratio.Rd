@@ -37,8 +37,8 @@ Current methods include: "ulsif", "rulsif", "maxnet"
  # Get some occurrence data
 
  occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
-                                              new.world = T,
-                                              cultivated = F)
+                                              new.world = TRUE,
+                                              cultivated = FALSE)
 
  # Thin down to unique occurrences
 

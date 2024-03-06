@@ -42,11 +42,13 @@ pnp_vine <- function(data, method, object = NULL){
 
 ##############################################
 #' @note This version of the dvine function was modified to omit a transpose step that was causing problems with 1-dimensional data
-safe_dvine <-
-function (x, vine, cores = 1) {
+#' @importFrom rvinecopulib dvinecop
+safe_dvine <- function (x, vine, cores = 1) {
+
   stopifnot(inherits(vine, "vine_dist"))
 
   x <- rvinecopulib:::expand_factors(x)
+
   if (!is.null(vine$names)) {
     x <- x[, vine$names, drop = FALSE]
   }

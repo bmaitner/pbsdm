@@ -11,6 +11,7 @@
 # @examples
 #' @return Returns a SpatialPoints dataframe with the data.frame containing fold designation for each point.
 #' @author Cory Merow <cory.merow@@gmail.com>
+#' @importFrom stats kmeans
 stratify_spatial <- function(occurrence_sf,
                             nfolds = NULL,
                             nsubclusters = NULL){
