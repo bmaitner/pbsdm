@@ -66,8 +66,8 @@ Either \code{method} or both \code{presence_method} and \code{background_method}
 
    # Get some occurrence data
    occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
-                                                new.world = T,
-                                                cultivated = F)
+                                                new.world = TRUE,
+                                                cultivated = FALSE)
 
    # Thin down to unique occurrences
    occurrences <- unique(occurrences[c("longitude","latitude")])

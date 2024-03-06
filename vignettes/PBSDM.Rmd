@@ -4,7 +4,7 @@ author: "Brian Maitner"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Presence Background Species Distribution Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,6 +32,9 @@ To start, we'll pull occurrence data for the plant species *Trillium vaseyi* fro
 library(BIEN)
 library(geodata)
 library(ggplot2)
+library(pbsdm)
+library(sf)
+library(terra)
 
 # Make a temporary directory to store climate data
 
@@ -83,7 +86,7 @@ make_range_map(occurrences = tv[c("longitude","latitude")],
 
 tv_rangebagged_polygon <-
   tv_rangebagged |>
-  as.polygons()%>%
+  as.polygons() |>
   st_as_sf()
 
 # get a bbox for plotting
@@ -201,7 +204,7 @@ tv_kde_kde_raster <- sdm_threshold(prediction_raster = tv_kde_kde_raster,
   
     tv_kde_kde_polygon <-
       tv_kde_kde_raster |>
-      as.polygons()%>%
+      as.polygons()|>
       st_as_sf()
 
 # Now, we'll plot the standardized temperature raster, along with the occurrence records and the range map 
@@ -284,7 +287,7 @@ tv_gaussian_kde_predictions <- project_plug_and_play(pnp_model = tv_gaussian_kde
   
     tv_gaussian_kde_polygon <-
       tv_gaussian_kde_raster |>
-      as.polygons()%>%
+      as.polygons()|>
       st_as_sf()
 
 # Now, we'll plot the standardized temperature raster, along with the occurrence records and the range map 
