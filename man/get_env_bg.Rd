@@ -22,8 +22,9 @@ get_env_bg(
 \item{width}{Numeric or NULL.  Width (meters or map units) of buffer. If NULL, uses max dist between nearest occurrences.}
 
 \item{constraint_regions}{An optional spatialpolygons* object that can be used to limit the selection of background points.}
-
-\item{returns}{A list containing 1) the background data, 2) the cell indices for which the background was taken}
+}
+\value{
+A list containing 1) the background data, 2) the cell indices for which the background was taken
 }
 \description{
 This function extracts background data around known presence records.
@@ -44,9 +45,9 @@ This background selection is, however, still limited by the buffer as well.
 
 # Get some occurrence data
 
-occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
-                                             new.world = T,
-                                             cultivated = F)
+occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
+                                             new.world = TRUE,
+                                             cultivated = FALSE)
 
 # Thin down to unique occurrences
 

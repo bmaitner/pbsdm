@@ -1,5 +1,5 @@
 Package: pbsdm
-Title: Presence-Background Species Distribution Modeling in a Plug-and-Play Framework.
+Title: Presence-Background Species Distribution Modeling in a Plug-and-Play Framework
 Version: 0.0.0.9000
 Authors@R:
     c(
@@ -13,7 +13,7 @@ Authors@R:
            role = c("aut"),
            email = "cory.merow@gmail.com")
            )
-Description: This package implements presence-background species distribution modeling in a plug-and-play framework
+Description: This package implements presence-background species distribution modeling in a plug-and-play framework.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -22,6 +22,7 @@ RoxygenNote: 7.2.3
 Imports:
   corpcor,
   densratio,
+  flexclust,
   geometry,
   kernlab,
   maxnet,
@@ -33,4 +34,7 @@ Imports:
   rvinecopulib,
   sf,
   terra
+Suggests:
+  geodata,
+  BIEN
           

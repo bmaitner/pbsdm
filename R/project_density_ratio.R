@@ -8,7 +8,8 @@
 project_density_ratio <- function(dr_model, data) {
 
   #Check that pnp_model is the correct class
-  if(class(dr_model) != "dr_model") {
+
+  if(!inherits(x = dr_model,what = "dr_model")) {
     stop("Invalid dr_model supplied.")
   }
 

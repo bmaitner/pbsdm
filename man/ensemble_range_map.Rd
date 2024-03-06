@@ -13,7 +13,9 @@ ensemble_range_map(
   bootstrap = "none",
   bootstrap_reps = 100,
   quantile = 0.05,
-  background_buffer_width = NULL
+  constraint_regions = NULL,
+  background_buffer_width = NULL,
+  ...
 )
 }
 \arguments{
@@ -36,6 +38,8 @@ or "doublebag" (presence and background functions are bootstrapped).}
 \item{quantile}{Quantile to use for thresholding.  Default is 0.05 (5 pct training presence). Set to 0 for minimum training presence (MTP).}
 
 \item{constraint_regions}{See get_env_bg documentation}
+
+\item{background_buffer_width}{Numeric or NULL.  Width (meters or map units) of buffer to use to select background environment. If NULL, uses max dist between nearest occurrences.}
 
 \item{...}{Additional parameters passed to internal functions.}
 }
@@ -67,8 +71,8 @@ Either \code{method} or both \code{presence_method} and \code{background_method}
  # Get some occurrence data
 
  occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
-                                              new.world = T,
-                                              cultivated = F)
+                                              new.world = TRUE,
+                                              cultivated = FALSE)
 
 
  # Thin down to unique occurrences

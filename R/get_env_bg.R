@@ -6,10 +6,10 @@
 #' @param method Methods for getting bg points. Current option is buffer
 #' @param width Numeric or NULL.  Width (meters or map units) of buffer. If NULL, uses max dist between nearest occurrences.
 #' @param constraint_regions An optional spatialpolygons* object that can be used to limit the selection of background points.
-#' @param returns A list containing 1) the background data, 2) the cell indices for which the background was taken
+#' @returns A list containing 1) the background data, 2) the cell indices for which the background was taken
 #' @note If supplying constraint_regions, any polygons in which the occurrences fall are considered fair game for background selection.
 #' This background selection is, however, still limited by the buffer as well.
-#' @importFrom raster intersect buffer
+#' @import terra
 #' @examples {
 #'
 #' # load packages
@@ -21,9 +21,9 @@
 #'
 #' # Get some occurrence data
 #'
-#' occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
-#'                                              new.world = T,
-#'                                              cultivated = F)
+#' occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
+#'                                              new.world = TRUE,
+#'                                              cultivated = FALSE)
 #'
 #' # Thin down to unique occurrences
 #'

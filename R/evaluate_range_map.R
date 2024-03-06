@@ -12,6 +12,7 @@
 #' @param bootstrap_reps Integer.  Number of bootstrap replicates to use (default is 100)
 #' @param quantile Quantile to use for thresholding.  Default is 0.05 (5 pct training presence). Set to 0 for minimum training presence (MTP).
 #' @param constraint_regions See get_env_bg documentation
+#' @param background_buffer_width Numeric or NULL.  Width (meters or map units) of buffer to use to select background environment. If NULL, uses max dist between nearest occurrences.
 #' @param ... Additional parameters passed to internal functions.
 #' @note Either `method` or both `presence_method` and `background_method` must be supplied.
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
@@ -33,8 +34,8 @@
 #'# Get some occurrence data
 #'
 #'  occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
-#'                                               new.world = T,
-#'                                               cultivated = F)
+#'                                               new.world = TRUE,
+#'                                               cultivated = FALSE)
 #'
 #'# Thin down to unique occurrences
 #'
@@ -48,7 +49,8 @@
 #'
 #'  env <- env[[c(1,12)]]
 #'
-#'# Evaluate a gaussian/gaussian model calculated with the numbag approach using 10 bootstrap replicates.
+#'# Evaluate a gaussian/gaussian model calculated with the numbag approach
+#'# using 10 bootstrap replicates.
 #'
 #'  evaluate_range_map(occurrences = occurrences,
 #'                     env = env,
@@ -59,7 +61,7 @@
 #'                     bootstrap_reps = 10,
 #'                     quantile = 0.05,
 #'                     constraint_regions = NULL,
-#'                     width = NULL)
+#'                     background_buffer_width = NULL)
 #'
 #'
 #'
@@ -73,7 +75,8 @@ evaluate_range_map <- function(occurrences,
                                bootstrap_reps = 100,
                                quantile = 0.05,
                                constraint_regions = NULL,
-                               width = NULL){
+                               background_buffer_width = NULL,
+                               ...){
 
   #Little internal function to handle nulls in method
   robust_in <- function(element,set){
@@ -120,7 +123,7 @@ evaluate_range_map <- function(occurrences,
               bg_data <- get_env_bg(coords = occurrences,
                                     env = env,
                                     method = "buffer",
-                                    width = width,
+                                    width = background_buffer_width,
                                     constraint_regions = constraint_regions)
 
               #Make empty output

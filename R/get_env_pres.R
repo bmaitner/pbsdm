@@ -16,9 +16,9 @@
 #'
 #' # Get some occurrence data
 #'
-#' occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
-#'                                              new.world = T,
-#'                                              cultivated = F)
+#' occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
+#'                                              new.world = TRUE,
+#'                                              cultivated = FALSE)
 #'
 #' # Thin down to unique occurrences
 #'

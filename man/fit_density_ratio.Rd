@@ -24,3 +24,48 @@ This function fits density-ratio species distribution models for the specified d
 \details{
 Current methods include: "ulsif", "rulsif", "maxnet"
 }
+\examples{
+{
+
+# load packages
+ library(geodata)
+
+ # make temp directory
+
+ temp <- tempdir()
+
+ # Get some occurrence data
+
+ occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
+                                              new.world = T,
+                                              cultivated = F)
+
+ # Thin down to unique occurrences
+
+ occurrences <- unique(occurrences[c("longitude","latitude")])
+
+ # Get bioclim data
+
+ env <- worldclim_global(var = "bio",
+                         res = 10,
+                         path = temp)
+
+ env <- env[[c(1,12)]]
+
+ # Get presence environmental data
+
+ pres_env <- get_env_pres(coords = occurrences,
+                          env = env)
+ # Get background environmental data
+
+ bg_env <- get_env_bg(coords = occurrences,
+                      env = env)
+
+ # Note that the functions to get the environmental data return lists,
+ # and only the "env" element of these is used in the fit function
+
+ maxnet_fit <- fit_density_ratio(presence = pres_env$env,
+                                 background = bg_env$env,
+                                 method = "maxnet")
+}
+}
