@@ -9,7 +9,7 @@ project_plug_and_play <- function(pnp_model, data) {
 
   #Check that pnp_model is the correct class
 
-  if(!inherits(x = dr_model,what = "pnp_model")) {
+  if(!inherits(x = pnp_model, what = "pnp_model")) {
     stop("Invalid pnp_model supplied.")
   }
 

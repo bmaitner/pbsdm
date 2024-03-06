@@ -2,29 +2,30 @@
 #' @description Splitting tool for cross-validation
 #' @details
 #' See Examples.
-#' @param occurrence_sp a SpatialPoints or SpatialPointsDataFrame object
+#' @param occurrence_sf a sf object containing occurrence records
 #' @param nfolds number of desired output folds.
 # @keywords
 #' @export
 # @examples
-#' @return Returns a SpatialPoints dataframe with the data.frame containing fold designation for each point.
+#' @return Returns a sf dataframe containing fold designation for each point.
 #' @author Cory Merow <cory.merow@@gmail.com>
-stratify_random <- function(occurrence_sp,
+stratify_random <- function(occurrence_sf,
                              nfolds = NULL){
 
 
     #Get number of occurrence records
-    n <- length(occurrence_sp)
+    n <- nrow(occurrence_sf)
 
     #Check for sufficient records for CV
-    if (n <= 5 | n < 5*nfolds) {
-      folds <- rep(1, n)
 
-      occurrence_sp <- SpatialPointsDataFrame(coords = occurrence_sp,
-                                              data = data.frame(fold = folds))
+    if (n <= 5 | n < 5*nfolds) {
+
+      occurrence_sf$fold = 1
 
       message('Get some more data if you want to use this many folds. All samples assigned to fold 1.')
-      return(occurrence_sp)
+
+      return(occurrence_sf)
+
     }
 
     #If there are enough records for CV, continue
@@ -41,7 +42,7 @@ stratify_random <- function(occurrence_sp,
     #populate vector
     for( i in 1:length(splits)){
 
-      folds[splits[[i]]]<-i
+      folds[splits[[i]]] <- i
 
     }
 
@@ -49,9 +50,10 @@ stratify_random <- function(occurrence_sp,
     rm(splits)
 
     #attach data
-    occurrence_sp <- SpatialPointsDataFrame(occurrence_sp,
-                                            data.frame(fold = folds))
 
-    return(occurrence_sp)
+    occurrence_sf$fold = folds
+
+
+    return(occurrence_sf)
 
 }
