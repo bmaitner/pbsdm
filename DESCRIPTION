@@ -13,7 +13,7 @@ Authors@R:
            role = c("aut"),
            email = "cory.merow@gmail.com")
            )
-Description: This package implements presence-background species distribution modeling in a plug-and-play framework.
+Description: This package implements presence-background species distribution modeling in a plug-and-play framework
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -26,6 +26,7 @@ Imports:
   kernlab,
   maxnet,
   mvtnorm,
+  nlme,
   np,
   pROC,
   robust,
