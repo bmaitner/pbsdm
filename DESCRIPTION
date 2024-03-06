@@ -35,5 +35,6 @@ Imports:
   terra
 Suggests:
   geodata,
-  BIEN
+  BIEN,
+  ggplot2
           

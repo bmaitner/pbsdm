@@ -30,8 +30,8 @@
 #'
 #'    # Get some occurrence data
 #'    occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
-#'                                                 new.world = T,
-#'                                                 cultivated = F)
+#'                                                 new.world = TRUE,
+#'                                                 cultivated = FALSE)
 #'
 #'    # Thin down to unique occurrences
 #'    occurrences <- unique(occurrences[c("longitude","latitude")])
