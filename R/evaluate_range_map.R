@@ -18,8 +18,8 @@
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
 #' Current density ratio methods include: "ulsif", "rulsif".
 #' @importFrom pROC roc auc
-#' @importFrom stats cor
-#' @importFrom terra setValues extract
+#' @importFrom stats cor na.omit
+#' @importFrom terra setValues extract values<- varnames<-
 #' @import sf
 #' @export
 #' @examples{

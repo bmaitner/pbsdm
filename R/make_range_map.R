@@ -16,6 +16,7 @@
 #' @param verbose Logical. If TRUE, prints progress messages.
 #' @param ... Additional parameters passed to internal functions.
 #' @note Either `method` or both `presence_method` and `background_method` must be supplied.
+#' @importFrom terra varnames<-
 #' @export
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
 #' Current density ratio methods include: "ulsif", "rulsif",and "maxnet".
