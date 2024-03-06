@@ -22,34 +22,45 @@ Here, we provide a few examples on the core functionality of the PBSDM package.
 
 ## Obtaining Occurrence and Climate data
 
-To start, we'll pull occurrence data for the plant species *Xanthium strumarium* from BIEN and environmental data from BioClim.
+To start, we'll pull occurrence data for the plant species *Trillium vaseyi* from BIEN and environmental data from BioClim.
 
 ```{r, fig.show='hold'}
 
+
+# Load libraries
+
 library(BIEN)
+library(geodata)
+library(ggplot2)
 
-xs <- BIEN_occurrence_species(species = "Xanthium strumarium",
-                              only.new.world = T)
+# Make a temporary directory to store climate data
 
-xs <- xs[xs$latitude > 10,]
+  temp <- tempdir()
 
-library(raster)
+# Get some occurrence data
 
-env <- getData("worldclim", var = "bio", res = 10)
+  tv <- BIEN_occurrence_species(species = "Trillium vaseyi")
+
+# Get environmental data
+  
+  env <- worldclim_global(var = "bio",
+                           res = 10,
+                           path = temp)
 
 # To make things a bit faster and easier, we'll limit ourselves to the 2 variables (mean temperature and annual precipitation)
 
-env <- env[[c("bio1","bio12")]]
-
+  
+  env <- env[[c(1,12)]]
+  
 # And we'll rescale the variables as well
 
 env <- scale(env)
 
 # Just to take a look to make sure we didn't mess anything up
+
 plot(env)
 
 ```
-
 
 ## Simplest case
 In the simplest case, we can rely on the function `make_range_map` which takes in longitude/latitude data (in that order) along with environmental layers and makes some simple defaults decisions to return a map produce with the specified settings. This function is easy to use, but doesn't have many features.
@@ -58,23 +69,48 @@ In the simplest case, we can rely on the function `make_range_map` which takes i
 
 library(pbsdm)
 
-xs_rangebagged <- 
-make_range_map(occurrences = xs[c("longitude","latitude")],
+tv_rangebagged <- 
+make_range_map(occurrences = tv[c("longitude","latitude")],
                env = env,
                presence_method = "rangebagging",
                background_method = "none",
-               background_buffer_width = 1000000)
+               background_buffer_width = 100000)
 
 
 #Lets see what it looks like
 
 #convert to polygon for easier visualization
-xs_rangebagged_polygon <- rasterToPolygons(xs_rangebagged,dissolve = TRUE)
+
+tv_rangebagged_polygon <-
+  tv_rangebagged |>
+  as.polygons()%>%
+  st_as_sf()
+
+# get a bbox for plotting
+
+tv_bbox <-
+tv_rangebagged_polygon |>
+  st_buffer(dist = 500000) |>
+  st_bbox()
 
 #Now, we'll plot the standardized temperature raster, along with the occurrence records and the range map 
-plot(env[[1]],xlim=c(-150,-30),ylim=c(0,70))
-points(xs[c("longitude","latitude")],pch=16,cex = .1,col="blue")
-plot(xs_rangebagged_polygon,add=T)
+
+ggplot(env)+
+  geom_raster(mapping = aes(x=x,y=y,fill=wc2.1_10m_bio_1))+
+  scale_fill_viridis_c(name="Temp. C", na.value = "transparent")+
+  scale_x_continuous(expand=c(0,0),
+                     limits = c(tv_bbox[1],tv_bbox[3]))+
+    scale_y_continuous(limits = c(tv_bbox[2],tv_bbox[4]),
+                     expand=c(0,0))+
+  theme_bw()+
+  geom_sf(data = tv_rangebagged_polygon,
+          fill = "grey",
+          size=2,
+          alpha=0.5)+
+    geom_point(data = tv,
+             mapping = aes(x=longitude,y=latitude))
+
+
 
 ```
 
@@ -89,84 +125,102 @@ For these function, users must supply the presence and background data directly.
 ```{r}
 
 
-# Here, we'll use the same data as before for Xanthium strumarium.
+# Here, we'll use the same data as before for Trillium vaseyi.
 
 # First, we get the presence data:
 
-xs_presence <- get_env_pres(coords = xs[c("longitude","latitude")],
-                            env = env)
+  tv_presence <- get_env_pres(coords = tv[c("longitude","latitude")],
+                              env = env)
 
-#The returned object 'xs_presence' contains two objects:
-  # 1) xs_presence$env a matrix of environmental covariates. This is what we need for modeling.
-  # 2) xs_presence$occurrence_sp a spatialpoints object containing the coordinate data. This is useful for conducting spatially stratified cross-validation.
+#The returned object 'tv_presence' contains two objects:
+
+  # 1) tv_presence$env a matrix of environmental covariates. This is what we need for modeling.
+  # 2) tv_presence$occurrence_sf a sf object containing the coordinate data. This is useful for conducting spatially stratified cross-validation.
 
 
 #Next, we'll select the background data
-xs_bg <- get_env_bg(coords = xs[c("longitude","latitude")],
+
+tv_bg <- get_env_bg(coords = tv[c("longitude","latitude")],
                     env = env,
-                    width = 1000000)
+                    width = 50000) #note that we used a small set of background points to expedite model fitting
 
-#The returned object 'xs_bg' contains two objects:
-  # 1) xs_bg$env a matrix of environmental covariates. This is what we need for modeling.
-  # 2) xs_bg$bg_cells a vector containing the environmental raster cell IDs that are present in xs_bg$env. This is useful for mapping the results.
-
-
-
-#Now, we can fit the model.  Previously we used rangebagging, this time we'll use a simple KDE estimation
-xs_kde_kde <- fit_plug_and_play(presence = xs_presence$env,
-                                background = xs_bg$env,
-                                method = "kde")
+# The returned object 'xs_bg' contains two objects:
+  # 1) tv_bg$env a matrix of environmental covariates. This is what we need for modeling.
+  # 2) tv_bg$bg_cells a vector containing the environmental raster cell IDs that are present in tv_bg$env. This is useful for mapping the results.
 
 
-#The object that was returned is of the class "pnp_model", which is essentially a list of model fits and associated metadata.
+# Now, we can fit the model.  Previously we used rangebagging, this time we'll use a simple KDE estimation
 
-#To view this data on a map, we can project it to the background data we used in fitting (or we could project to a new location entirely). In either case, we use the function `project_plu_and_play`.
-
-
-xs_kde_kde_predictions <- project_plug_and_play(pnp_model = xs_kde_kde,
-                                                data = xs_bg$env)
+  tv_kde_kde <- fit_plug_and_play(presence = tv_presence$env,
+                                  background = tv_bg$env,
+                                  method = "kde")
 
 
+# The object that was returned is of the class "pnp_model", which is essentially a list of model fits and associated metadata.
 
-#Now we can make a template raster to store our predictions
+# To view this data on a map, we can project it to the background data we used in fitting (or we could project to a new location entirely). In either case, we use the function `project_plu_and_play`.
 
-xs_kde_kde_raster <- setValues(x = env[[1]],values = NA)
 
+  tv_kde_kde_predictions <- project_plug_and_play(pnp_model = tv_kde_kde,
+                                                  data = tv_bg$env)
+
+
+
+#Now we can make a blank raster to store our predictions
+  
+  tv_kde_kde_raster <- env[[1]]
+
+  values(tv_kde_kde_raster) <- NA
 
 #Add our predictions to the raster
-xs_kde_kde_raster[xs_bg$bg_cells] <-  xs_kde_kde_predictions
+
+  tv_kde_kde_raster[tv_bg$bg_cells] <-  tv_kde_kde_predictions
 
 #Now, we can plot our raster
-plot(xs_kde_kde_raster,
-     xlim = c(-150,-30),
-     ylim = c(0,70))
+
+  plot(tv_kde_kde_raster,
+       xlim = c(tv_bbox[1],tv_bbox[3]),
+       ylim = c(tv_bbox[2],tv_bbox[4]))
+  points(tv[c("longitude","latitude")])
+  
+```
+
+```{r thresholding}
 
 #To threshold this continuous raster to yield a binary raster
 
-xs_kde_kde_raster <- sdm_threshold(prediction_raster = xs_kde_kde_raster,
-                                   occurrence_sp = xs_presence$occurrence_sp,
+tv_kde_kde_raster <- sdm_threshold(prediction_raster = tv_kde_kde_raster,
+                                   occurrence_sf = tv_presence$occurrence_sf,
                                    quantile = 0.05,
                                    return_binary = T)
 
 
 # As before, we'll plot this on top of temperature and occurrence records to see how well we did
 
+  # convert to polygon for easier visualization
+  
+    tv_kde_kde_polygon <-
+      tv_kde_kde_raster |>
+      as.polygons()%>%
+      st_as_sf()
 
-# Convert the raster to a polygon for visualization
-xs_kde_kde_polygon <- rasterToPolygons(xs_kde_kde_raster,
-                                       dissolve = TRUE)
+# Now, we'll plot the standardized temperature raster, along with the occurrence records and the range map 
 
-plot(env[[1]],
-     xlim = c(-150,-30),
-     ylim = c(0,70))
+  ggplot(env)+
+    geom_raster(mapping = aes(x=x,y=y,fill=wc2.1_10m_bio_1))+
+    scale_fill_viridis_c(name="Temp. C", na.value = "transparent")+
+    scale_x_continuous(expand=c(0,0),
+                       limits = c(tv_bbox[1],tv_bbox[3]))+
+      scale_y_continuous(limits = c(tv_bbox[2],tv_bbox[4]),
+                       expand=c(0,0))+
+    theme_bw()+
+    geom_sf(data = tv_kde_kde_polygon,
+            fill = "grey",
+            size=2,
+            alpha=0.5)+
+      geom_point(data = tv,
+               mapping = aes(x=longitude,y=latitude))
 
-plot(xs_kde_kde_polygon,add=T)
-
-plot(xs_presence$occurrence_sp,
-     add = T,
-     pch = 16,
-     cex = .1,
-     col = "blue")
 
 
 ```
@@ -180,58 +234,75 @@ In the previous example we used Kernel Density Estimation to estimate both the p
 ```{r}
 
 
-#We'll rely on the same data as last time for simplicity.
-#Since we're using different methods for estimating the presence and background distributions, we need to specify these separately:
+# We'll rely on the same data as last time for simplicity.
+# Since we're using different methods for estimating the presence and background distributions, we need to specify these separately:
 
 
 
-xs_gaussian_kde <- fit_plug_and_play(presence = xs_presence$env,
-                                     background = xs_bg$env,
+tv_gaussian_kde <- fit_plug_and_play(presence = tv_presence$env,
+                                     background = tv_bg$env,
                                      presence_method = "gaussian",
                                      background_method = "kde")
 
 
-xs_gaussian_kde_predictions <- project_plug_and_play(pnp_model = xs_gaussian_kde,
-                                                data = xs_bg$env)
+tv_gaussian_kde_predictions <- project_plug_and_play(pnp_model = tv_gaussian_kde,
+                                                data = tv_bg$env)
 
-#Now, we again convert everything to a raster and then to a polygon
+# Now, we again convert everything to a raster and then to a polygon
 
-xs_gaussian_kde_raster <- setValues(x = env[[1]],values = NA)
-xs_gaussian_kde_raster[xs_bg$bg_cells] <-  xs_gaussian_kde_predictions
+  tv_gaussian_kde_raster <- env[[1]]
 
-#Now, we can plot our raster
-plot(xs_gaussian_kde_raster,
-     xlim = c(-150,-30),
-     ylim = c(0,70))
+  values(tv_gaussian_kde_raster) <- NA
 
-#To threshold this continuous raster to yield a binary raster
+  tv_gaussian_kde_raster[tv_bg$bg_cells] <-  tv_gaussian_kde_predictions
 
-xs_gaussian_kde_raster <- sdm_threshold(prediction_raster = xs_gaussian_kde_raster,
-                                   occurrence_sp = xs_presence$occurrence_sp,
-                                   quantile = 0.05,
-                                   return_binary = T)
+# Now, we can plot our raster
+  
+  plot(tv_gaussian_kde_raster,
+       xlim = c(tv_bbox[1],tv_bbox[3]),
+       ylim = c(tv_bbox[2],tv_bbox[4]))
+  points(tv[c("longitude","latitude")])
+  
+```  
+
+
+```{r thresholding gk}  
+# To threshold this continuous raster to yield a binary raster
+
+  tv_gaussian_kde_raster <- sdm_threshold(prediction_raster = tv_gaussian_kde_raster,
+                                     occurrence_sf = tv_presence$occurrence_sf,
+                                     quantile = 0.05,
+                                     return_binary = T)
 
 
 # As before, we'll plot this on top of temperature and occurrence records to see how well we did
 
 
 # Convert the raster to a polygon for visualization
-xs_gaussian_kde_polygon <- rasterToPolygons(xs_gaussian_kde_raster,
-                                       dissolve = TRUE)
 
+  # convert to polygon for easier visualization
+  
+    tv_gaussian_kde_polygon <-
+      tv_gaussian_kde_raster |>
+      as.polygons()%>%
+      st_as_sf()
 
-plot(env[[1]],
-     xlim = c(-150,-30),
-     ylim = c(0,70))
+# Now, we'll plot the standardized temperature raster, along with the occurrence records and the range map 
 
-plot(xs_gaussian_kde_polygon,add=T)
-
-plot(xs_presence$occurrence_sp,
-     add = T,
-     pch = 16,
-     cex = .1,
-     col = "blue")
-
+  ggplot(env)+
+    geom_raster(mapping = aes(x=x,y=y,fill=wc2.1_10m_bio_1))+
+    scale_fill_viridis_c(name="Temp. C", na.value = "transparent")+
+    scale_x_continuous(expand=c(0,0),
+                       limits = c(tv_bbox[1],tv_bbox[3]))+
+      scale_y_continuous(limits = c(tv_bbox[2],tv_bbox[4]),
+                       expand=c(0,0))+
+    theme_bw()+
+    geom_sf(data = tv_gaussian_kde_polygon,
+            fill = "grey",
+            size=2,
+            alpha=0.5)+
+      geom_point(data = tv,
+               mapping = aes(x=longitude,y=latitude))
 
 
 ```
@@ -243,25 +314,31 @@ In addition to methods that estimate the presence and background distributions s
 ```{r}
 
 
-xs_maxnet <- fit_density_ratio(presence = xs_presence$env,
-                               background = xs_bg$env,
-                               method = "maxnet")
-
-
-xs_maxnet_predictions <- project_density_ratio(dr_model = xs_maxnet,
-                                               data = xs_bg$env)
+  tv_maxnet <- fit_density_ratio(presence = tv_presence$env,
+                                 background = tv_bg$env,
+                                 method = "maxnet")
+  
+  
+  tv_maxnet_predictions <- project_density_ratio(dr_model = tv_maxnet,
+                                                 data = tv_bg$env)
 
 
 #Now, we again convert everything to a raster and then to a polygon
+  
+  tv_maxnet_raster <- env[[1]]
 
-xs_maxnet_raster <- setValues(x = env[[1]],values = NA)
-xs_maxnet_raster[xs_bg$bg_cells] <-  xs_maxnet_predictions
+  values(tv_maxnet_raster) <- NA
+
+  tv_maxnet_raster[tv_bg$bg_cells] <-  tv_maxnet_predictions
+
 
 #Now, we can plot our raster
-plot(xs_maxnet_raster,
-     xlim = c(-150,-30),
-     ylim = c(0,70),
-     main = "MaxNet")
+  
+    plot(tv_maxnet_raster,
+       xlim = c(tv_bbox[1],tv_bbox[3]),
+       ylim = c(tv_bbox[2],tv_bbox[4]))
+  points(tv[c("longitude","latitude")])
+
 
 
 
@@ -272,10 +349,10 @@ plot(xs_maxnet_raster,
 To evaluate the quality of a model, we can use the function `evaluate_range_map`, which conducts 5-fold, spatially-stratified, cross-validation on fitted models. Here, we'll conduct cross-validation on a model using a Gaussian estimate of both the presence and background distributions.
 
 
-```{r}
+```{r model evaluation}
 
 
-xs_gaussian_gaussian_fit <- evaluate_range_map(occurrences = xs[c("longitude","latitude")],
+tv_gaussian_gaussian_fit <- evaluate_range_map(occurrences = tv[c("longitude","latitude")],
                                           env = env,
                                           presence_method = "gaussian",
                                           background_method = "gaussian")
@@ -283,7 +360,7 @@ xs_gaussian_gaussian_fit <- evaluate_range_map(occurrences = xs[c("longitude","l
 
 #Rather than looking at all of the results, we'll focus on just a few:
 
-xs_gaussian_gaussian_fit$fold_results[c('testing_AUC','testing_sensitivity','testing_specificity')]
+tv_gaussian_gaussian_fit$fold_results[c('testing_AUC','testing_sensitivity','testing_specificity')]
 
 #The AUC gives us an overall idea of the discriminatory ability of the model, while the sensitivity and specificity tell us how well it discriminates presence vs. background points (respectively).
 
