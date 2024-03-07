@@ -400,7 +400,9 @@ evaluate_range_map <- function(occurrences,
                                            occurrence = 0))
 
                         full_roc_obj <- roc(response = full_suitability_v_occurrence$occurrence,
-                                               predictor = full_suitability_v_occurrence$suitability)
+                                               predictor = full_suitability_v_occurrence$suitability,
+                                            level = c(0,1),
+                                            direction = "<")
 
 
 
