@@ -78,7 +78,7 @@ pnp_rangebagging <- function(data, method, object = NULL, v = 100, d = 2, p = 0.
 
     #Do bagging
     for(i in 1:v){
-      #    print(i) # counter for troubleshooting
+          #print(i) # counter for troubleshooting
       if(d == 1){
 
         test.pts <-
@@ -94,7 +94,8 @@ pnp_rangebagging <- function(data, method, object = NULL, v = 100, d = 2, p = 0.
         test.dat <- as.matrix(data[,object$rangebag_models[[i]]$vars])
 
         tri.pts <- tsearchn(as.matrix(object$rangebag_models[[i]]$data),
-                            delaunayn(object$rangebag_models[[i]]$data),
+                            delaunayn(object$rangebag_models[[i]]$data,
+                                      options = "QbB"),
                             test.dat)
 
         #tri.pts <- tsearchn(as.matrix(models[[i]]$endpoints), delaunayn(models[[i]]$endpoints), test.dat)
