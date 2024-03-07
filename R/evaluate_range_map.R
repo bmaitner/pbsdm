@@ -80,6 +80,7 @@ evaluate_range_map <- function(occurrences,
                                ...){
 
   #Little internal function to handle nulls in method
+
   robust_in <- function(element,set){
     if(is.null(element)){
       return(FALSE)
@@ -257,11 +258,11 @@ evaluate_range_map <- function(occurrences,
                   #Training data
 
                     training_roc_obj <- roc(response = fold_training_suitability_v_occurrence$occurrence,
-                                   predictor = fold_training_suitability_v_occurrence$suitability)
+                                   predictor = fold_training_suitability_v_occurrence$suitability,
+                                   level = c(0,1),
+                                   direction = "<")
 
                     out$training_AUC[i] <- training_roc_obj$auc
-
-
 
                     out$training_pAUC_specificity[i] <- auc(roc = training_roc_obj,
                         partial.auc = c(.8, 1),
@@ -276,7 +277,9 @@ evaluate_range_map <- function(occurrences,
                   #Testing data
 
                     testing_roc_obj <- roc(response = fold_testing_suitability_v_occurrence$occurrence,
-                                            predictor = fold_testing_suitability_v_occurrence$suitability)
+                                            predictor = fold_testing_suitability_v_occurrence$suitability,
+                                           level = c(0,1),
+                                           direction = "<")
 
                     out$testing_AUC[i] <- testing_roc_obj$auc
 
