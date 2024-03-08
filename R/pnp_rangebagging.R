@@ -93,10 +93,9 @@ pnp_rangebagging <- function(data, method, object = NULL, v = 100, d = 2, p = 0.
 
         test.dat <- as.matrix(data[,object$rangebag_models[[i]]$vars])
 
-        tri.pts <- tsearchn(as.matrix(object$rangebag_models[[i]]$data),
-                            delaunayn(object$rangebag_models[[i]]$data,
-                                      options = "QbB"),
-                            test.dat)
+        tri.pts <- tsearchn(x = as.matrix(object$rangebag_models[[i]]$data),
+                            t = delaunayn(object$rangebag_models[[i]]$data),
+                            xi =  test.dat)
 
         #tri.pts <- tsearchn(as.matrix(models[[i]]$endpoints), delaunayn(models[[i]]$endpoints), test.dat)
         test.pts <- !is.na(tri.pts$p[,1])

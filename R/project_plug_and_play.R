@@ -5,6 +5,7 @@
 #' @param data covariate data
 #' @return A vector of relative suitabilities evaluates at the covariates supplied in the data object.
 #' @export
+#' @note The tsearchn function underlying rangebagging seems to fail sometimes with very uneven predictors. Rescaling helps.
 project_plug_and_play <- function(pnp_model, data) {
 
   #Check that pnp_model is the correct class
