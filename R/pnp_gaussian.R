@@ -32,7 +32,7 @@ pnp_gaussian <- function(data, method, type = "regularized", object = NULL){
     if(type == "regularized"){
 
       mean <- colMeans(data) # estimated mean of presence points
-      data.est <- as.numeric(corpcor::cov.shrink(data)) # robust estimated covariance of presence points
+      data.est <- as.numeric(corpcor::cov.shrink(data, verbose = FALSE)) # robust estimated covariance of presence points
       sigma <- matrix(as.numeric(data.est),
                       nrow = sqrt(length(data.est))) # reformat
 
