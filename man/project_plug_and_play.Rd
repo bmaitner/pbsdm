@@ -17,3 +17,6 @@ A vector of relative suitabilities evaluates at the covariates supplied in the d
 \description{
 This function projects fitted plug-and-play species distribution models onto new covariates.
 }
+\note{
+The tsearchn function underlying rangebagging seems to fail sometimes with very uneven predictors. Rescaling helps.
+}
