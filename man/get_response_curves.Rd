@@ -14,32 +14,20 @@ get_response_curves(
 )
 }
 \arguments{
-\item{envMeans}{A vector of means for each environmental predictor in the dataset.}
+\item{env_bg}{Object returned by get_env_bg}
 
-\item{envSDs}{A vector of standard deviations for each environmental predictor in the dataset.}
+\item{env_pres}{Object returned by get_env_pres}
 
-\item{dirs}{A list of directories that includes the algorithm directory and diagnostics directory.}
+\item{pnp_model}{Object returned  by \code{fit_plug_and_play} or \code{fit_density_ratio}}
 
-\item{env}{An \code{RasterStack} or \code{RasterBrick} of environmental predictors.}
+\item{n.int}{Number of points along which to calculate the response curve}
 
-\item{stats}{A data.frame that contains information about each model that was fit, including model names, species names, and which algorithm was used.}
+\item{envMeans}{A vector of means for each environmental predictor in the dataset. (not used)}
 
-\item{bg}{An \code{OccurrenceData} object containing the background data for each species.}
-
-\item{toDo}{A list of parameters that specifies the details of the analysis to be run.}
-
-\item{best.var}{A vector of character strings that specifies the environmental predictors to include in the response curves.}
-
-\item{priors}{A list that contains prior distributions for each parameter in the model.}
-
-\item{pres}{An \code{OccurrenceData} object containing the presence data for each species.}
-
-\item{extrapLimits}{A list of limits to use for extrapolation of the response curves.}
-
-\item{openFigs}{A logical value indicating whether to open the generated plots.}
+\item{envSDs}{A vector of standard deviations for each environmental predictor in the dataset.(not used)}
 }
 \value{
-This function generates a set of PDF files in the diagnostics directory for each species, with one file per model. The PDF files contain plots of the response curves for each environmental predictor in the model.
+This function generates a set of marginal predictions for each environmental variable, holding other variables constant
 }
 \description{
 Given an environmental data set, fitted models, and a directory to output plots, this function generates response curves for each predictor in the model. The response curves depict the predicted change in probability of presence as a function of the environmental predictor while holding all other predictors constant at their mean values.
