@@ -6,6 +6,7 @@
 #' @param method Methods for getting bg points. Current option is buffer
 #' @param width Numeric or NULL.  Width (meters or map units) of buffer. If NULL, uses max dist between nearest occurrences.
 #' @param constraint_regions An optional spatialpolygons* object that can be used to limit the selection of background points.
+#' @param standardize Logical. If TRUE, the variables will be scaled and centered
 #' @returns A list containing 1) the background data, 2) the cell indices for which the background was taken
 #' @note If supplying constraint_regions, any polygons in which the occurrences fall are considered fair game for background selection.
 #' This background selection is, however, still limited by the buffer as well.
@@ -54,7 +55,8 @@ get_env_bg <- function(coords,
                        env,
                        method = "buffer",
                        width = NULL,
-                       constraint_regions = NULL) {
+                       constraint_regions = NULL,
+                       standardize = TRUE) {
 
   #check for bad coords
 
@@ -138,8 +140,66 @@ get_env_bg <- function(coords,
 
       env_vals$cell <- NULL
 
+    #scale and center if needed
+
+      if(standardize){
+
+        env_mean <- colMeans(env_vals)
+
+        env_sd <- apply(X = env_vals,MARGIN = 2,FUN = sd)
+
+        env_vals <- rescale_w_objects(data = env_vals,
+                                      mean_vector = env_mean,
+                                      sd_vector = env_sd)
+
+
+      }else{
+
+        # set as NA if scaling not done
+
+        env_mean <- NA
+        env_sd <- NA
+
+      }
+
   return(test <- list(env = env_vals,
-                      bg_cells = buffer_cells))
+                      bg_cells = buffer_cells,
+                      env_mean = env_mean,
+                      env_sd = env_sd))
 
 
 }# end fx
+
+#' @name rescale_w_objects
+#' @title Rescale a dataset using vectors of means and SDs
+#' @author Brian Maitner
+#' @description
+#' A little function to rescale data using vectors of means and sds
+rescale_w_objects <- function(data, mean_vector, sd_vector){
+
+  #?sweep #option
+  # out <- sweep(data, 2L,mean_vector , "-") |>
+  #   sweep(2L,sd_vector , "/")
+
+  out <- t((t(data) - mean_vector)/sd_vector)
+
+  return(out)
+
+}
+#' @name descale_w_objects
+#' @title Return scaled variables to the original scale using means and SDs
+#' @author Brian Maitner
+#' @description
+#' A little function to rescale data using vectors of means and sds
+descale_w_objects <- function(data, mean_vector, sd_vector){
+
+  #?sweep #option
+  # out <- sweep(2L,sd_vector , "*") |>
+  #   sweep(data, 2L,mean_vector , "+")
+
+  out <- t((t(data) * sd_vector) + mean_vector)
+
+  return(out)
+
+}
+

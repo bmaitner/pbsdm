@@ -129,10 +129,22 @@ For these function, users must supply the presence and background data directly.
 
 # Here, we'll use the same data as before for Trillium vaseyi.
 
-# First, we get the presence data:
+#First, we'll select the background data
+
+tv_bg <- get_env_bg(coords = tv[c("longitude","latitude")],
+                    env = env,
+                    width = 50000,
+                    standardize = TRUE) #note that we used a small set of background points to expedite model fitting
+
+# The returned object 'xs_bg' contains two objects:
+  # 1) tv_bg$env a matrix of environmental covariates. This is what we need for modeling.
+  # 2) tv_bg$bg_cells a vector containing the environmental raster cell IDs that are present in tv_bg$env. This is useful for mapping the results.
+
+# Next, we get the presence data:
 
   tv_presence <- get_env_pres(coords = tv[c("longitude","latitude")],
-                              env = env)
+                              env = env,
+                              env_bg = tv_bg)
 
 #The returned object 'tv_presence' contains two objects:
 
@@ -140,15 +152,6 @@ For these function, users must supply the presence and background data directly.
   # 2) tv_presence$occurrence_sf a sf object containing the coordinate data. This is useful for conducting spatially stratified cross-validation.
 
 
-#Next, we'll select the background data
-
-tv_bg <- get_env_bg(coords = tv[c("longitude","latitude")],
-                    env = env,
-                    width = 50000) #note that we used a small set of background points to expedite model fitting
-
-# The returned object 'xs_bg' contains two objects:
-  # 1) tv_bg$env a matrix of environmental covariates. This is what we need for modeling.
-  # 2) tv_bg$bg_cells a vector containing the environmental raster cell IDs that are present in tv_bg$env. This is useful for mapping the results.
 
 
 # Now, we can fit the model.  Previously we used rangebagging, this time we'll use a simple KDE estimation

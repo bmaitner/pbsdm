@@ -3,6 +3,7 @@
 #' @description This function extracts presence data at known presence records.
 #' @param coords Coordinates (long,lat) to extract values for
 #' @param env Environmental rasterstack in any projection
+#' @param env_bg Background data produced by `get_env_bg`, used for re-scaling
 #' @importFrom terra extract
 #' @importFrom sf st_as_sf st_crs st_transform
 #' @export
@@ -39,7 +40,7 @@
 #'                         env = env)
 #'
 #' }
-get_env_pres <- function(coords, env) {
+get_env_pres <- function(coords, env, env_bg = NULL) {
 
   #check for bad coords
 
@@ -87,6 +88,28 @@ get_env_pres <- function(coords, env) {
       env_data <- env_data[setdiff(x = 1:nrow(env_data),y = nas),]
 
       coords <- coords[setdiff(x = 1:nrow(coords),y = nas),]
+
+    # rescale if background was rescaled
+
+    if(!is.null(env_bg)){
+
+      if(all(!is.na(env_bg$env_mean)) & all(!is.na(env_bg$env_sd))){
+
+        env_data <- rescale_w_objects(data = env_data,
+                                      mean_vector = env_bg$env_mean,
+                                      sd_vector = env_bg$env_sd
+                                      )
+
+      }else(
+
+        stop("NA values for one or more background variable means or SDs")
+
+      )
+
+
+
+    }
+
 
     #return output
 

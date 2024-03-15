@@ -9,7 +9,8 @@ get_env_bg(
   env,
   method = "buffer",
   width = NULL,
-  constraint_regions = NULL
+  constraint_regions = NULL,
+  standardize = TRUE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ get_env_bg(
 \item{width}{Numeric or NULL.  Width (meters or map units) of buffer. If NULL, uses max dist between nearest occurrences.}
 
 \item{constraint_regions}{An optional spatialpolygons* object that can be used to limit the selection of background points.}
+
+\item{standardize}{Logical. If TRUE, the variables will be scaled and centered}
 }
 \value{
 A list containing 1) the background data, 2) the cell indices for which the background was taken

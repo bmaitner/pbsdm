@@ -68,13 +68,48 @@ pnp_rangebagging <- function(data, method, object = NULL, v = 100, d = 2, p = 0.
 
   if(method == "predict"){
 
-    #set parameters
-    v <- length(object$rangebag_models)
-    d <- ifelse(is.null(dim(object$rangebag_models[[1]]$endpoints)), 1, dim(object$rangebag_models[[1]]$endpoints)[2])
-    n <- dim(data)
+    # set parameters
+      v <- length(object$rangebag_models)
+      d <- ifelse(is.null(dim(object$rangebag_models[[1]]$endpoints)), 1, dim(object$rangebag_models[[1]]$endpoints)[2])
+      n <- dim(data)
 
-    #make empty output
-    prediction <- numeric(n[1])
+    # make empty output
+      prediction <- numeric(n[1])
+
+    # remove any variables without variation, since rangebagging requires variation
+        # actually, this variation should only be needed for fitting, no predicting
+
+      # sds <- apply(X = data,MARGIN = 2,FUN = sd)
+      #
+      #   if(any(sds == 0)){
+      #
+      #     message(length(which(sds==0)), " variables have no variation, dropping variables ", names(sds)[which(sds==0)])
+      #
+      #     preds_to_remove <- names(sds)[which(sds==0)]
+      #
+      #     preds_to_keep <- names(sds)[which(sds!=0)]
+      #
+      #     data <- data[preds_to_keep]
+      #
+      #     n <- dim(data)
+      #
+      #     # clean dimensionality
+      #
+      #       if(n[2] < d){
+      #
+      #         message("Updating dimensionality")
+      #
+      #         d <- n[2]
+      #
+      #       }
+
+
+
+
+
+        }
+
+
 
     #Do bagging
     for(i in 1:v){
@@ -109,6 +144,5 @@ pnp_rangebagging <- function(data, method, object = NULL, v = 100, d = 2, p = 0.
     return(log(prediction))
   }
 
-}
 
 
