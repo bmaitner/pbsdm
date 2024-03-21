@@ -16,7 +16,7 @@
 get_response_curves <- function(env_bg,
                                 env_pres,
                                 pnp_model,
-                                n.int = 200,
+                                n.int = 1000,
                                 envMeans = NULL,
                                 envSDs = NULL
 ){
@@ -89,8 +89,6 @@ get_response_curves <- function(env_bg,
     names(newdat) <- best.var
     newdat[best.var[[k]]] <- x.vals[[best.var[k]]]
 
-
-
       if(inherits(pnp_model,"dr_model")){
 
         pr <- project_density_ratio(dr_model =  pnp_model,
@@ -105,17 +103,21 @@ get_response_curves <- function(env_bg,
 
     }
 
-    # estimate background density at new points
-      bgd_newdat <- approx(x = bgd[[best.var[k]]]$x,
-                           y = bgd[[best.var[k]]]$y,
-                           xout = newdat[best.var[[k]]] %>% unlist())
 
-      bgd_newdat$y[which(is.na(bgd_newdat$y))] <- 0
+    # get background curve
+
+        # estimate background density at new points
+        bgd_newdat <- approx(x = bgd[[best.var[k]]]$x,
+                             y = bgd[[best.var[k]]]$y,
+                             xout = newdat[best.var[[k]]] %>% unlist())
+
+        bgd_newdat$y[which(is.na(bgd_newdat$y))] <- 0
 
     # estimate presence density at new points
+
       pd_newdat <- approx(x = pd[[best.var[k]]]$x,
-                           y = pd[[best.var[k]]]$y,
-                           xout = newdat[best.var[[k]]] %>% unlist())
+                          y = pd[[best.var[k]]]$y,
+                          xout = newdat[best.var[[k]]] %>% unlist())
 
       pd_newdat$y[which(is.na(pd_newdat$y))] <- 0
 
