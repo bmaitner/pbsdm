@@ -8,8 +8,7 @@
 #' @param nu Numeric. Tuning parameter for nu-svm
 #' @param sigma NULL or Numeric.  Tuning parameter of rbf kernel, will estimate if left NULL (default).
 #' @details For fitting, an object is not required (and will be ignored). For prediction, parameters v,nu,and sigma are not needed and will be ignored.
-#' @importFrom  kernlab ksvm
-#' @importFrom stats predict
+#' @importFrom  kernlab ksvm predict
 #' @keywords internal
 pnp_lobagoc <- function(data, method, object = NULL, v = 100, nu = 0.01, sigma = NULL){
 

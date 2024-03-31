@@ -8,7 +8,7 @@ get_response_curves(
   env_bg,
   env_pres,
   pnp_model,
-  n.int = 200,
+  n.int = 1000,
   envMeans = NULL,
   envSDs = NULL
 )
