@@ -130,7 +130,7 @@ get_env_bg <- function(coords,
 
     # toss and cells that have NA values
 
-      env_vals <- env_vals[complete.cases(env_vals),]
+      env_vals <- env_vals[complete.cases(env_vals),,drop=FALSE]
 
     # output should be a (1) the environmental variables returned and (2) a vector of cell IDS in the buffers.
 

@@ -85,7 +85,7 @@ get_env_pres <- function(coords, env, env_bg = NULL) {
 
     # Toss any NAs from both the environmental data and coordinates
 
-      env_data <- env_data[setdiff(x = 1:nrow(env_data),y = nas),]
+      env_data <- env_data[setdiff(x = 1:nrow(env_data),y = nas),,drop=FALSE]
 
       coords <- coords[setdiff(x = 1:nrow(coords),y = nas),]
 
@@ -100,13 +100,17 @@ get_env_pres <- function(coords, env, env_bg = NULL) {
                                       sd_vector = env_bg$env_sd
                                       )
 
-      }else(
+      }
 
-        stop("NA values for one or more background variable means or SDs")
+      #if some values are NA, but not all, throw an error
+        if( any(!is.na(env_bg$env_mean)) | any(!is.na(env_bg$env_sd)) &
+            !(all(is.na(env_bg$env_mean)) & all(is.na(env_bg$env_sd)))
 
-      )
+        ){
+          stop("Some environmental value means and/or SDs are NAs")
+          }
 
-
+      # if a bg was included, but rescaling wasn't done, no need for further action
 
     }
 
