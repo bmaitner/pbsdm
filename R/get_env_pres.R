@@ -103,7 +103,8 @@ get_env_pres <- function(coords, env, env_bg = NULL) {
       }
 
       #if some values are NA, but not all, throw an error
-        if( any(!is.na(env_bg$env_mean)) | any(!is.na(env_bg$env_sd)) &
+
+        if( any(is.na(env_bg$env_mean)) | any(is.na(env_bg$env_sd)) &
             !(all(is.na(env_bg$env_mean)) & all(is.na(env_bg$env_sd)))
 
         ){

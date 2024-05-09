@@ -1,30 +1,10 @@
----
-title: "PBSDM R package"
-author: "Brian Maitner"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Presence Background Species Distribution Models}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r setup, include = FALSE}
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-```
 
-This R package  implements Presence-Background Species Distribution Modeling (PBSDM) within the plug-and-play framework of Drake and Richards (2018).  By plug-and-play, we mean that the overall methodology can accommodate any method for estimating either density functions or density ratios. Users are thus able to choose from multiple methods for estimating SDMs using an evolving set of methods within one unified framework.
-
-Here, we provide a few examples on the core functionality of the PBSDM package.
-
-## Obtaining Occurrence and Climate data
-
-To start, we'll pull occurrence data for the plant species *Trillium vaseyi* from BIEN and environmental data from BioClim.
-
-```{r, fig.show='hold'}
+## ----fig.show='hold'----------------------------------------------------------
 
 
 # Load libraries
@@ -64,12 +44,8 @@ env <- scale(env)
 
 plot(env)
 
-```
 
-## Simplest case
-In the simplest case, we can rely on the function `make_range_map` which takes in longitude/latitude data (in that order) along with environmental layers and makes some simple defaults decisions to return a map produce with the specified settings. This function is easy to use, but doesn't have many features.
-
-```{r, echo=FALSE, results='asis'}
+## ----echo=FALSE, results='asis'-----------------------------------------------
 
 tv_rangebagged <- 
 make_range_map(occurrences = tv[c("longitude","latitude")],
@@ -114,17 +90,8 @@ ggplot(env)+
 
 
 
-```
 
-## Working with model objects
-
-For many situations we may want more control over the models that are fit, or we may want to directly access the plug-and-play model so that we can either 1) save the model object, or 2) project the model object to another region in time or space. In these cases, the functions `fit_plug_and_play` and `fit_density_ratio` can be used to fit models, and the functions `project_plug_and_play` and `project_density_ratio` to project them.
-
-For these function, users must supply the presence and background data directly.  We have included simple functions to help with this, but for most uses additional cleaning and other data processing will probably be useful.
-
-
-
-```{r}
+## -----------------------------------------------------------------------------
 
 
 # Here, we'll use the same data as before for Trillium vaseyi.
@@ -188,9 +155,8 @@ tv_bg <- get_env_bg(coords = tv[c("longitude","latitude")],
        ylim = c(tv_bbox[2],tv_bbox[4]))
   points(tv[c("longitude","latitude")])
   
-```
 
-```{r thresholding}
+## ----thresholding-------------------------------------------------------------
 
 #To threshold this continuous raster to yield a binary raster
 
@@ -228,15 +194,8 @@ tv_kde_kde_raster <- sdm_threshold(prediction_raster = tv_kde_kde_raster,
 
 
 
-```
 
-
-
-## Flexibility
-
-In the previous example we used Kernel Density Estimation to estimate both the presence and background distribution.  However, Plug-and-Play modeling is incredibly flexible, and allows us to mix and match any methods for density estimation. To demonstrate, in the next example we'll combine a Gaussian estimate the presence distribution and a KDe estimate of the background distribution.
-
-```{r}
+## -----------------------------------------------------------------------------
 
 # We'll rely on the same data as last time for simplicity.
 # Since we're using different methods for estimating the presence and background distributions, we need to specify these separately:
@@ -264,10 +223,8 @@ tv_gaussian_kde_predictions <- project_plug_and_play(pnp_model = tv_gaussian_kde
        ylim = c(tv_bbox[2],tv_bbox[4]))
   points(tv[c("longitude","latitude")])
   
-```  
 
-
-```{r thresholding gk}  
+## ----thresholding gk----------------------------------------------------------
 # To threshold this continuous raster to yield a binary raster
 
   tv_gaussian_kde_raster <- sdm_threshold(prediction_raster = tv_gaussian_kde_raster,
@@ -306,13 +263,8 @@ tv_gaussian_kde_predictions <- project_plug_and_play(pnp_model = tv_gaussian_kde
                mapping = aes(x=longitude,y=latitude))
 
 
-```
 
-## Density-ratio models
-
-In addition to methods that estimate the presence and background distributions separately, the package accommodates methods that directly estimate the density ratio, including uLSIF and MaxNet.
-
-```{r maxnet}
+## ----maxnet-------------------------------------------------------------------
 
 
   tv_maxnet <- fit_density_ratio(presence = tv_presence$env,
@@ -343,63 +295,4 @@ In addition to methods that estimate the presence and background distributions s
 
 
 
-```
 
-### CV Maxnet
-
-```{r CVmaxnet}
-
-
-  tv_CVmaxnet <- fit_density_ratio(presence = tv_presence$env,
-                                 background = tv_bg$env,
-                                 method = "CVmaxnet")
-  
-  
-  tv_CVmaxnet_predictions <- project_density_ratio(dr_model = tv_CVmaxnet,
-                                                 data = tv_bg$env)
-
-
-#Now, we again convert everything to a raster and then to a polygon
-  
-  tv_CVmaxnet_raster <- env[[1]]
-
-  values(tv_CVmaxnet_raster) <- NA
-
-  tv_CVmaxnet_raster[tv_bg$bg_cells] <-  tv_CVmaxnet_predictions
-
-
-#Now, we can plot our raster
-  
-    plot(tv_CVmaxnet_raster,
-       xlim = c(tv_bbox[1],tv_bbox[3]),
-       ylim = c(tv_bbox[2],tv_bbox[4]))
-  points(tv[c("longitude","latitude")])
-
-```
-
-
-## Model Quality
-
-To evaluate the quality of a model, we can use the function `evaluate_range_map`, which conducts 5-fold, spatially-stratified, cross-validation on fitted models. Here, we'll conduct cross-validation on a model using a Gaussian estimate of both the presence and background distributions.
-
-
-```{r model evaluation}
-
-
-tv_gaussian_gaussian_fit <- evaluate_range_map(occurrences = tv[c("longitude","latitude")],
-                                          env = env,
-                                          presence_method = "gaussian",
-                                          background_method = "gaussian")
-
-
-#Rather than looking at all of the results, we'll focus on just a few:
-
-tv_gaussian_gaussian_fit$fold_results[c('testing_AUC','testing_sensitivity','testing_specificity')]
-
-#The AUC gives us an overall idea of the discriminatory ability of the model, while the sensitivity and specificity tell us how well it discriminates presence vs. background points (respectively).
-
-
-```
-## References
-
-Drake, J.M. & Richards, R.L. (2018) Estimating environmental suitability. Ecosphere , 9, e02373.
