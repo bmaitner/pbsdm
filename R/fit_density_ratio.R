@@ -58,8 +58,7 @@ fit_density_ratio <- function(presence = NULL,
                               ...){
   #Check data and method
 
-  #for now do this manually, but once function skeleton is working do this by looking up available internals
-  current_modules <- c("ulsif","rulsif","maxnet","CVmaxnet")
+  current_modules <-     current_modules <- get_functions(type = "dr")
 
   if(!method %in% current_modules) {
     stop(paste("Method not implemented. Please select one of: ",

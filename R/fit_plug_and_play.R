@@ -65,8 +65,7 @@ fit_plug_and_play <- function(presence = NULL,
 
   # Check that methods are available
 
-  #for now do this manually, but once function skeleton is working do this by looking up available internals
-  current_modules <- c("gaussian","kde","vine","rangebagging","lobagoc","none")
+    current_modules <- get_functions(type = "pnp")
 
   if(!presence_method %in% current_modules) {
     stop(paste("Presence method not implemented. Please select one of: ",
