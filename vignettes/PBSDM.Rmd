@@ -345,32 +345,32 @@ In addition to methods that estimate the presence and background distributions s
 
 ```
 
-### CV Maxnet
+### ulsif
 
-```{r CVmaxnet}
+```{r ulsif}
 
 
-  tv_CVmaxnet <- fit_density_ratio(presence = tv_presence$env,
+  tv_ulsif <- fit_density_ratio(presence = tv_presence$env,
                                  background = tv_bg$env,
-                                 method = "CVmaxnet")
+                                 method = "ulsif")
   
   
-  tv_CVmaxnet_predictions <- project_density_ratio(dr_model = tv_CVmaxnet,
+  tv_ulsif_predictions <- project_density_ratio(dr_model = tv_ulsif,
                                                  data = tv_bg$env)
 
 
 #Now, we again convert everything to a raster and then to a polygon
   
-  tv_CVmaxnet_raster <- env[[1]]
+  tv_ulsif_raster <- env[[1]]
 
-  values(tv_CVmaxnet_raster) <- NA
+  values(tv_ulsif_raster) <- NA
 
-  tv_CVmaxnet_raster[tv_bg$bg_cells] <-  tv_CVmaxnet_predictions
+  tv_ulsif_raster[tv_bg$bg_cells] <-  tv_ulsif_predictions
 
 
 #Now, we can plot our raster
   
-    plot(tv_CVmaxnet_raster,
+    plot(tv_ulsif_raster,
        xlim = c(tv_bbox[1],tv_bbox[3]),
        ylim = c(tv_bbox[2],tv_bbox[4]))
   points(tv[c("longitude","latitude")])
@@ -384,7 +384,6 @@ To evaluate the quality of a model, we can use the function `evaluate_range_map`
 
 
 ```{r model evaluation}
-
 
 tv_gaussian_gaussian_fit <- evaluate_range_map(occurrences = tv[c("longitude","latitude")],
                                           env = env,

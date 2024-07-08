@@ -14,7 +14,9 @@ make_range_map(
   bootstrap_reps = 100,
   quantile = 0.05,
   background_buffer_width = NULL,
+  constraint_regions = NULL,
   verbose = FALSE,
+  standardize_preds = TRUE,
   ...
 )
 }
@@ -40,7 +42,11 @@ or "doublebag" (presence and background functions are bootstrapped).}
 \item{background_buffer_width}{The width (in m for unprojected rasters and map units for projected rasters) of the buffer to use for background data.
 Defaults to NULL, which will take the maximum distance between occurrence records.}
 
+\item{constraint_regions}{See get_env_bg documentation}
+
 \item{verbose}{Logical. If TRUE, prints progress messages.}
+
+\item{standardize_preds}{Logical. Should environmental layers be scaled? Default is TRUE.}
 
 \item{...}{Additional parameters passed to internal functions.}
 }
