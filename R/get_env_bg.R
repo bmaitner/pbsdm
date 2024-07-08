@@ -11,7 +11,7 @@
 #' @note If supplying constraint_regions, any polygons in which the occurrences fall are considered fair game for background selection.
 #' This background selection is, however, still limited by the buffer as well.
 #' @importFrom  terra buffer vect extract
-#' @importFrom stats complete.cases
+#' @importFrom stats complete.cases sd
 #' @export
 #' @examples {
 #'
@@ -173,8 +173,12 @@ get_env_bg <- function(coords,
 #' @name rescale_w_objects
 #' @title Rescale a dataset using vectors of means and SDs
 #' @author Brian Maitner
+#' @param data dataframe or matrix for rescaling
+#' @param mean_vector vector of means to use for rescaling.  Should be one value for each column in the data
+#' @param sd_vector vector of sds to use for rescaling.  Should be one value for each column in the data
 #' @description
 #' A little function to rescale data using vectors of means and sds
+#' @keywords internal
 rescale_w_objects <- function(data, mean_vector, sd_vector){
 
   #?sweep #option
@@ -189,8 +193,12 @@ rescale_w_objects <- function(data, mean_vector, sd_vector){
 #' @name descale_w_objects
 #' @title Return scaled variables to the original scale using means and SDs
 #' @author Brian Maitner
+#' @param data dataframe or matrix for rescaling
+#' @param mean_vector vector of means to use for rescaling.  Should be one value for each column in the data
+#' @param sd_vector vector of sds to use for rescaling.  Should be one value for each column in the data
 #' @description
 #' A little function to rescale data using vectors of means and sds
+#' @keywords internal
 descale_w_objects <- function(data, mean_vector, sd_vector){
 
   #?sweep #option

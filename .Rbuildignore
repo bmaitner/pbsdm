@@ -3,3 +3,5 @@
 ^LICENSE\.md$
 ^misc$
 ^old_builds$
+^doc$
+^Meta$

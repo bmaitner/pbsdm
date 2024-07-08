@@ -4,3 +4,5 @@
 .Ruserdata
 misc
 *.Rproj
+/doc/
+/Meta/

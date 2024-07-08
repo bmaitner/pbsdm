@@ -65,7 +65,8 @@ fit_plug_and_play <- function(presence = NULL,
 
   # Check that methods are available
 
-    current_modules <- get_functions(type = "pnp")
+    current_modules <- get_functions(type = "pnp") |>
+      gsub(pattern = "pnp_",replacement = "")
 
   if(!presence_method %in% current_modules) {
     stop(paste("Presence method not implemented. Please select one of: ",

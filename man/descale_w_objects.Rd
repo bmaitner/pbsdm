@@ -6,9 +6,17 @@
 \usage{
 descale_w_objects(data, mean_vector, sd_vector)
 }
+\arguments{
+\item{data}{dataframe or matrix for rescaling}
+
+\item{mean_vector}{vector of means to use for rescaling.  Should be one value for each column in the data}
+
+\item{sd_vector}{vector of sds to use for rescaling.  Should be one value for each column in the data}
+}
 \description{
 A little function to rescale data using vectors of means and sds
 }
 \author{
 Brian Maitner
 }
+\keyword{internal}

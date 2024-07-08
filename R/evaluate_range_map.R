@@ -13,6 +13,7 @@
 #' @param quantile Quantile to use for thresholding.  Default is 0.05 (5 pct training presence). Set to 0 for minimum training presence (MTP).
 #' @param constraint_regions See get_env_bg documentation
 #' @param background_buffer_width Numeric or NULL.  Width (meters or map units) of buffer to use to select background environment. If NULL, uses max dist between nearest occurrences.
+#' @param standardize_preds Logical. Should environmental layers be scaled? Default is TRUE.
 #' @param ... Additional parameters passed to internal functions.
 #' @note Either `method` or both `presence_method` and `background_method` must be supplied.
 #' @details Current plug-and-play methods include: "gaussian", "kde","vine","rangebagging", "lobagoc", and "none".
@@ -77,6 +78,7 @@ evaluate_range_map <- function(occurrences,
                                quantile = 0.05,
                                constraint_regions = NULL,
                                background_buffer_width = NULL,
+                               standardize_preds = TRUE,
                                ...){
 
   #Little internal function to handle nulls in method
@@ -111,26 +113,31 @@ evaluate_range_map <- function(occurrences,
 
     # Note that this is overkill, since we don't need the presence data, just the sf file, but it prevents code duplication.
 
-              presence_data <- get_env_pres(coords = occurrences,
-                                            env = env)
-
 
           # Make template
 
               template <- env[[1]]
               template[1:ncell(template)] <- 1:ncell(template)
 
-
-              #Divide data into folds
-              presence_data$occurrence_sf <- stratify_spatial(occurrence_sf = presence_data$occurrence_sf,
-                                                nfolds = NULL,
-                                                nsubclusters = NULL)
-
               bg_data <- get_env_bg(coords = occurrences,
                                     env = env,
                                     method = "buffer",
                                     width = background_buffer_width,
-                                    constraint_regions = constraint_regions)
+                                    constraint_regions = constraint_regions,
+                                    standardize = standardize_preds)
+
+
+              presence_data <- get_env_pres(coords = occurrences,
+                                            env = env,
+                                            env_bg = bg_data)
+
+              #Divide data into folds
+              presence_data$occurrence_sf <- stratify_spatial(occurrence_sf = presence_data$occurrence_sf,
+                                                              nfolds = NULL,
+                                                              nsubclusters = NULL)
+
+
+
 
               # Make empty output
 

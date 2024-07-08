@@ -15,6 +15,7 @@ evaluate_range_map(
   quantile = 0.05,
   constraint_regions = NULL,
   background_buffer_width = NULL,
+  standardize_preds = TRUE,
   ...
 )
 }
@@ -40,6 +41,8 @@ or "doublebag" (presence and background functions are bootstrapped).}
 \item{constraint_regions}{See get_env_bg documentation}
 
 \item{background_buffer_width}{Numeric or NULL.  Width (meters or map units) of buffer to use to select background environment. If NULL, uses max dist between nearest occurrences.}
+
+\item{standardize_preds}{Logical. Should environmental layers be scaled? Default is TRUE.}
 
 \item{...}{Additional parameters passed to internal functions.}
 }

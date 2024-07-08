@@ -64,8 +64,8 @@ Current methods include: "ulsif", "rulsif", "maxnet"
  # Note that the functions to get the environmental data return lists,
  # and only the "env" element of these is used in the fit function
 
- maxnet_fit <- fit_density_ratio(presence = pres_env$env,
+ ulsif_fit <- fit_density_ratio(presence = pres_env$env,
                                  background = bg_env$env,
-                                 method = "maxnet")
+                                 method = "ulsif")
 }
 }

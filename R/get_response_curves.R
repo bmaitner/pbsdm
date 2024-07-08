@@ -12,7 +12,8 @@
 #' @return This function generates a set of marginal predictions for each environmental variable, holding other variables constant
 #' @export
 #' @author Cory Merow, modified by Brian Maitner
-
+#' @importFrom stats approx density
+#' @importFrom dplyr bind_rows
 get_response_curves <- function(env_bg,
                                 env_pres,
                                 pnp_model,
@@ -64,14 +65,20 @@ get_response_curves <- function(env_bg,
     return()
   }
 
-  pd <- apply(X = env_pres$env,
-        MARGIN = 2,
-        FUN = function(x){density(x,adjust=2)})
 
-  bgd <- apply(X = env_bg$env,
-               MARGIN = 2,
-               FUN = function(x){density(x,adjust=2)})
+  # these density estimates are only used if a pnp presence or abscence function is omitted
 
+    pd <- apply(X = env_pres$env,
+                MARGIN = 2,
+                FUN = function(x){density(x,adjust=2)})
+
+
+    bgd <- apply(X = env_bg$env,
+                 MARGIN = 2,
+                 FUN = function(x){density(x,adjust=2)})
+
+    pd_newdat <- data.frame()
+    bgd_newdat <- data.frame()
 
   # what would be useful:
 
@@ -106,20 +113,112 @@ get_response_curves <- function(env_bg,
 
     # get background curve
 
-        # estimate background density at new points
-        bgd_newdat <- approx(x = bgd[[best.var[k]]]$x,
-                             y = bgd[[best.var[k]]]$y,
-                             xout = newdat[best.var[[k]]] %>% unlist())
+    # Use different methods depending on whether presence and/or background density were part of the model
 
-        bgd_newdat$y[which(is.na(bgd_newdat$y))] <- 0
+    if(inherits(pnp_model,"pnp_model")){
 
-    # estimate presence density at new points
+      # presence
+
+      if(pnp_model$f1_bs) {
+        #If bs WAS done, use a do.call for each iteration and average them
+        f1_est <- 0
+
+        #It would be good to include a foreach option
+        for(i in 1:length(pnp_model$f1)){
+          f1_est <-
+            f1_est +
+            do.call(what = paste('pnp_',pnp_model$f1_method,sep = ""),
+                    list(data = newdat,
+                         method = "predict",
+                         object = pnp_model$f1[[i]]))
+
+
+        }
+
+        pd_newdat <- data.frame(y = f1_est/length(pnp_model$f1) %>%
+                                  exp())
+
+
+      }else{
+
+        #If bs wasn't done, just use one do.call
+        pd_newdat <- data.frame(y = do.call(what = paste('pnp_', pnp_model$f1_method, sep = ""),
+                      list(data = newdat,
+                           method = "predict",
+                           object = pnp_model$f1)))
+
+        if(length(pd_newdat) > 0){pd_newdat <- exp(pd_newdat)}
+
+
+      }
+
+      #background
+
+      if(pnp_model$f0_bs) {
+        #If bs WAS done, use a do.call for each iteration and average them
+        f0_est <- 0
+
+        #It would be good to include a foreach option
+        for(i in 1:length(pnp_model$f0)){
+          f0_est <-
+            f0_est +
+            do.call(what = paste('pnp_',pnp_model$f0_method,sep = ""),
+                    list(data = newdat,
+                         method = "predict",
+                         object = pnp_model$f0[[i]]))
+
+
+        }
+
+        bgd_newdat <- data.frame(y = f0_est/length(pnp_model$f0) %>% exp())
+
+
+      }else{
+
+        #If bs wasn't done, just use one do.call
+        bgd_newdat <- data.frame(y= do.call(what = paste('pnp_',pnp_model$f0_method,sep = ""),
+                       list(data = newdat,
+                            method = "predict",
+                            object = pnp_model$f0)))
+
+        if(length(bgd_newdat) > 0){bgd_newdat <- exp(bgd_newdat)}
+
+
+      }
+
+
+
+    }
+
+
+    if(length(pd_newdat) == 0){
+
+      # estimate presence density at new points
 
       pd_newdat <- approx(x = pd[[best.var[k]]]$x,
                           y = pd[[best.var[k]]]$y,
                           xout = newdat[best.var[[k]]] %>% unlist())
 
       pd_newdat$y[which(is.na(pd_newdat$y))] <- 0
+
+
+    }
+
+    if( length(bgd_newdat) == 0){
+
+
+      # estimate background density at new points
+      bgd_newdat <- approx(x = bgd[[best.var[k]]]$x,
+                           y = bgd[[best.var[k]]]$y,
+                           xout = newdat[best.var[[k]]] %>% unlist())
+
+      bgd_newdat$y[which(is.na(bgd_newdat$y))] <- 0
+
+
+
+    }
+
+
 
     out_k <- data.frame(variable = best.var[[k]],
                x_values = newdat[best.var[[k]]] %>% unname(),
@@ -146,3 +245,5 @@ get_response_curves <- function(env_bg,
   return(marginal_vals)
 
 }
+
+

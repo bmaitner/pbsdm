@@ -48,9 +48,9 @@
 #'  # Note that the functions to get the environmental data return lists,
 #'  # and only the "env" element of these is used in the fit function
 #'
-#'  maxnet_fit <- fit_density_ratio(presence = pres_env$env,
+#'  ulsif_fit <- fit_density_ratio(presence = pres_env$env,
 #'                                  background = bg_env$env,
-#'                                  method = "maxnet")
+#'                                  method = "ulsif")
 #'}
 fit_density_ratio <- function(presence = NULL,
                               background = NULL,
@@ -58,7 +58,8 @@ fit_density_ratio <- function(presence = NULL,
                               ...){
   #Check data and method
 
-  current_modules <-     current_modules <- get_functions(type = "dr")
+  current_modules <-     current_modules <- get_functions(type = "dr") |>
+    gsub(pattern = "dr_",replacement = "")
 
   if(!method %in% current_modules) {
     stop(paste("Method not implemented. Please select one of: ",

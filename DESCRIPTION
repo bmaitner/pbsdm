@@ -1,6 +1,6 @@
 Package: pbsdm
 Title: Presence-Background Species Distribution Modeling in a Plug-and-Play Framework
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R:
     c(
     person(given = "Brian",
@@ -19,7 +19,7 @@ Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports:
   corpcor,
   densratio,
@@ -33,8 +33,7 @@ Imports:
   robust,
   rvinecopulib,
   sf,
-  terra,
-  CVmaxnet 
+  terra
 Suggests:
   geodata,
   BIEN,
