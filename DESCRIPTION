@@ -33,7 +33,8 @@ Imports:
   robust,
   rvinecopulib,
   sf,
-  terra
+  terra,
+  dplyr
 Suggests:
   geodata,
   BIEN,
