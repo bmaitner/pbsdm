@@ -13,6 +13,6 @@ The package is build on a hierarchy of modular functions, each of which calls on
 
 1. The highest-level functions are `make_range_map` and `evaluate_range_map`, which are wrappers for...
 2. The next-highest-level functions, `fit_plug_and_play`, `fit_density_ratio`, `project_plug_and_play`, and `project_density_ratio`, which are wrappers for ...
-3. Internal modules such as `pnp_kde` or `dr_ulsif`.  These modules both models to environmental covariates and predict values at environmental covariates from fitted models.  These modules are largely wrappers around existing functions for fitting density functions or density-ratios.  Modules beginning with "pnp_" pertain to density functions while models beginning with "dr_" pertain to density ratio functions.
+3. Internal modules such as `pnp_kde` or `dr_ulsif`.  These modules both model the environmental covariates and predict values at environmental covariates from fitted models.  These modules are largely wrappers around existing functions for fitting density functions or density-ratios.  Modules beginning with "pnp_" pertain to density functions while models beginning with "dr_" pertain to density ratio functions.
 
 This hierarchical structure built on low-level internal modules is designed to allow for the easy addition of new methods by adding small, self-contained modules.
