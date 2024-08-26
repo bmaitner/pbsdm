@@ -3,12 +3,24 @@ Title: Presence-Background Species Distribution Modeling in a Plug-and-Play Fram
 Version: 0.0.0.9001
 Authors@R:
     c(
-    person(given = "Brian",
+    person(given = "Brian S.",
            family = "Maitner",
            role = c("aut", "cre"),
            email = "bmaitner@gmail.com",
            comment = c(ORCID = "https://orcid.org/0000-0002-2118-9880")),
-    person(given = "Cory",
+           person(given = "Robert L.",
+           family = "Richards",
+           role = c("aut"),
+           email = "r.richards@gatech.edu"),
+           person(given = "Ben S.",
+           family = "Carlson",
+           role = c("ctb"),
+           email = "ben.s.carlson@gmail.com"),
+           person(given = "John M.",
+           family = "Drake",
+           role = c("aut"),
+           email = "john@drakeresearchlab.com"),
+           person(given = "Cory",
            family = "Merow",
            role = c("aut"),
            email = "cory.merow@gmail.com")
