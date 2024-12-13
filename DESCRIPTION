@@ -1,6 +1,6 @@
 Package: S4DM
 Title: Small Sample Size Species Distribution Modelling
-Version: 0.0.0.9001
+Version: 0.0.1
 Authors@R:
     c(
     person(given = "Brian S.",
