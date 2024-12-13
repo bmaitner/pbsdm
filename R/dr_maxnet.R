@@ -85,8 +85,9 @@ dr_maxnet <- function(presence_data = NULL,
     predict.maxnet <- getFromNamespace("predict.maxnet", "maxnet")
 
     prediction <- predict.maxnet(object = object$ratio,
-                                          newdata = projection_data,
-                                          clamp = clamp)
+                                 newdata = projection_data,
+                                 clamp = clamp,
+                                 type="exponential")
 
     return(prediction)
   }
