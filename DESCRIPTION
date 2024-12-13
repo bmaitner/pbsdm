@@ -1,5 +1,5 @@
-Package: pbsdm
-Title: Presence-Background Species Distribution Modeling in a Plug-and-Play Framework
+Package: S4DM
+Title: Small Sample Size Species Distribution Modelling
 Version: 0.0.0.9001
 Authors@R:
     c(
@@ -25,7 +25,7 @@ Authors@R:
            role = c("aut"),
            email = "cory.merow@gmail.com")
            )
-Description: This package implements presence-background species distribution modeling in a plug-and-play framework.
+Description: This package implements multiple distribution modelling methods that are suited to species with small sample sizes (e.g., poorly sampled species or rare species).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
