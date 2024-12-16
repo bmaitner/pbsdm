@@ -6,7 +6,7 @@ Authors@R:
     person(given = "Brian S.",
            family = "Maitner",
            role = c("aut", "cre"),
-           email = "bmaitner@gmail.com",
+           email = "bmaitner@usf.edu",
            comment = c(ORCID = "https://orcid.org/0000-0002-2118-9880")),
            person(given = "Robert L.",
            family = "Richards",
