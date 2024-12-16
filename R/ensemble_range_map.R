@@ -25,40 +25,30 @@
 #' @export
 #' @examples {
 #'
-#'# load packages
-#'  library(geodata)
 #'
-#'  # make temp directory
+#'# load in sample data
 #'
-#'  temp <- tempdir()
+#'  library(S4DM)
+#'  library(terra)
 #'
-#'  # Get some occurrence data
+#'  # occurrence points
+#'    data("sample_points")
+#'    occurrences <- sample_points
 #'
-#'  occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
-#'                                               new.world = TRUE,
-#'                                               cultivated = FALSE)
+#'  # environmental data
+#'    env <- rast(system.file('ex/sample_env.tif', package="S4DM"))
 #'
+#'  # rescale the environmental data
 #'
-#'  # Thin down to unique occurrences
-#'  occurrences <- unique(occurrences[c("longitude","latitude")])
+#'    env <- scale(env)
 #'
-#'  # Get bioclim data
-#'
-#'  env <- worldclim_global(var = "bio",
-#'                          res = 10,
-#'                          path = temp)
-#'
-#'
-#'  env <- env[[c(1,12)]]
-#'
-#'  ensemble <- ensemble_range_map(occurrences = occurrences,
-#'                                 env = env,
-#'                                 method = NULL,
-#'                                 presence_method = c("gaussian", "rangebagging"),
-#'                                 background_method = "gaussian",
-#'                                 bootstrap = "numbag",
-#'                                 bootstrap_reps = 10,
-#'                                 quantile = 0.05)
+#' ensemble <- ensemble_range_map(occurrences = occurrences,
+#'                                env = env,
+#'                                method = NULL,
+#'                                presence_method = c("gaussian", "kde"),
+#'                                background_method = "gaussian",
+#'                                quantile = 0.05,
+#'                                background_buffer_width = 100000  )
 #' }
 ensemble_range_map <- function(occurrences,
                                env,
