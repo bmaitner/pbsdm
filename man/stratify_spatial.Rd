@@ -39,7 +39,7 @@ See Examples.
 
  occurrences <- st_as_sf(x = occurrences,coords = c(1,2))
 
-manual <- stratify_spatial(occurrence_sf = occurrences,nfolds = 5,nsubclusters = 10)
+manual <- stratify_spatial(occurrence_sf = occurrences,nfolds = 5,nsubclusters = 5)
 default <- stratify_spatial(occurrence_sf = occurrences)
 
 

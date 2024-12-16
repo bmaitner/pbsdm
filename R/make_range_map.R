@@ -146,7 +146,7 @@ make_range_map <- function(occurrences,
         prediction_raster <- env[[1]]
         values(prediction_raster) <- NA
 
-        message("assigning values")
+        if(verbose){message("assigning values")}
 
         prediction_raster[bg_data$bg_cells] <- predictions
 

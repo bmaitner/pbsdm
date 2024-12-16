@@ -20,6 +20,29 @@ Splitting tool for cross-validation
 \details{
 See Examples.
 }
+\examples{
+{
+
+# load in sample data
+
+ library(S4DM)
+ library(terra)
+ library(sf)
+
+ # occurrence points
+   data("sample_points")
+   occurrences <- sample_points
+
+
+ occurrences <- st_as_sf(x = occurrences,coords = c(1,2))
+
+
+random_folds <- stratify_random(occurrence_sf = occurrences,
+                               nfolds = 5)
+
+
+}
+}
 \author{
 Cory Merow \href{mailto:cory.merow@gmail.com}{cory.merow@gmail.com}
 }

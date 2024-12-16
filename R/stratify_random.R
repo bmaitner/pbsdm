@@ -9,6 +9,27 @@
 # @examples
 #' @return Returns a sf dataframe containing fold designation for each point.
 #' @author Cory Merow <cory.merow@@gmail.com>
+#' @examples {
+#'
+#'# load in sample data
+#'
+#'  library(S4DM)
+#'  library(terra)
+#'  library(sf)
+#'
+#'  # occurrence points
+#'    data("sample_points")
+#'    occurrences <- sample_points
+#'
+#'
+#'  occurrences <- st_as_sf(x = occurrences,coords = c(1,2))
+#'
+#'
+#'random_folds <- stratify_random(occurrence_sf = occurrences,
+#'                                nfolds = 5)
+#'
+#'
+#' }
 stratify_random <- function(occurrence_sf,
                              nfolds = NULL){
 

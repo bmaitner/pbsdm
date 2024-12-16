@@ -261,15 +261,15 @@ evaluate_range_map <- function(occurrences,
 
                     out$training_AUC[i] <- training_roc_obj$auc
 
-                    out$training_pAUC_specificity[i] <- auc(roc = training_roc_obj,
+                    out$training_pAUC_specificity[i] <- suppressWarnings(auc(roc = training_roc_obj,
                         partial.auc = c(.8, 1),
                         partial.auc.correct = TRUE,
-                        partial.auc.focus = "specificity")[[1]]
+                        partial.auc.focus = "specificity")[[1]])
 
-                    out$training_pAUC_sensitivity[i] <- auc(roc = training_roc_obj,
+                    out$training_pAUC_sensitivity[i] <- suppressWarnings(auc(roc = training_roc_obj,
                         partial.auc = c(.8, 1),
                         partial.auc.correct = TRUE,
-                        partial.auc.focus = "sensitivity")[[1]]
+                        partial.auc.focus = "sensitivity")[[1]])
 
                   #Testing data
 
@@ -282,15 +282,15 @@ evaluate_range_map <- function(occurrences,
 
 
 
-                    out$testing_pAUC_specificity[i] <- auc(roc = testing_roc_obj,
+                    out$testing_pAUC_specificity[i] <- suppressWarnings(auc(roc = testing_roc_obj,
                                                             partial.auc = c(.8, 1),
                                                             partial.auc.correct = TRUE,
-                                                            partial.auc.focus = "specificity")[[1]]
+                                                            partial.auc.focus = "specificity")[[1]])
 
-                    out$testing_pAUC_sensitivity[i] <- auc(roc = testing_roc_obj,
+                    out$testing_pAUC_sensitivity[i] <- suppressWarnings(auc(roc = testing_roc_obj,
                                                             partial.auc = c(.8, 1),
                                                             partial.auc.correct = TRUE,
-                                                            partial.auc.focus = "sensitivity")[[1]]
+                                                            partial.auc.focus = "sensitivity")[[1]])
 
 
 
@@ -403,15 +403,15 @@ evaluate_range_map <- function(occurrences,
 
 
 
-                        out_full$full_pAUC_specificity <- auc(roc = full_roc_obj,
+                        out_full$full_pAUC_specificity <- suppressWarnings(auc(roc = full_roc_obj,
                                                                partial.auc = c(.8, 1),
                                                                partial.auc.correct = TRUE,
-                                                               partial.auc.focus = "specificity")[[1]]
+                                                               partial.auc.focus = "specificity")[[1]])
 
-                        out_full$full_pAUC_sensitivity <- auc(roc = full_roc_obj,
+                        out_full$full_pAUC_sensitivity <- suppressWarnings(auc(roc = full_roc_obj,
                                                                partial.auc = c(.8, 1),
                                                                partial.auc.correct = TRUE,
-                                                               partial.auc.focus = "sensitivity")[[1]]
+                                                               partial.auc.focus = "sensitivity")[[1]])
 
                         out_full$full_AUC <- full_roc_obj$auc
 
