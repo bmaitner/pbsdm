@@ -63,29 +63,21 @@ Either \code{method} or both \code{presence_method} and \code{background_method}
 \examples{
 {
 
-# load packages
-   library(geodata)
+# load in sample data
 
-   # make temp directory
+ library(S4DM)
+ library(terra)
 
-   temp <- tempdir()
+ # occurrence points
+   data("sample_points")
+   occurrences <- sample_points
 
-   # Get some occurrence data
-   occurrences <- BIEN::BIEN_occurrence_species(species = "Xanthium strumarium",
-                                                new.world = TRUE,
-                                                cultivated = FALSE)
+ # environmental data
+   env <- rast(system.file('ex/sample_env.tif', package="S4DM"))
 
-   # Thin down to unique occurrences
-   occurrences <- unique(occurrences[c("longitude","latitude")])
+ # rescale the environmental data
 
-   # Get bioclim data
-
-   env <- worldclim_global(var = "bio",
-                           res = 10,
-                           path = temp)
-
-
-   env <- env[[c(1,12)]]
+   env <- scale(env)
 
    map <- make_range_map(occurrences = occurrences,
                          env = env,

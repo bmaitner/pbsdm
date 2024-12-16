@@ -9,7 +9,7 @@
 #' @export
 #' @return List of class "dr_model" containing model objects and metadata needed for projecting the fitted models.
 #' @export
-#' @examples \donttest {
+#' @examples \donttest{
 #'
 #'# load in sample data
 #'
@@ -45,7 +45,7 @@
 #                                background = bg_env$env,
 #                                method = "rulsif")
 #'
-#'}
+#' }
 fit_density_ratio <- function(presence = NULL,
                               background = NULL,
                               method = NULL,

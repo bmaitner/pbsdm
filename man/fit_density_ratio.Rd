@@ -25,7 +25,7 @@ This function fits density-ratio species distribution models for the specified d
 Current methods include: "ulsif", "rulsif", "maxnet"
 }
 \examples{
-\donttest {
+\donttest{
 
 # load in sample data
 

@@ -9,32 +9,21 @@
 #' @export
 #' @examples  {
 #'
-#' # load packages
-#'  library(geodata)
+#'# load in sample data
 #'
-#' # make temp directory
+#'  library(S4DM)
+#'  library(terra)
 #'
-#'  temp <- tempdir()
+#'  # occurrence points
+#'    data("sample_points")
+#'    occurrences <- sample_points
 #'
-#' # Get some occurrence data
+#'  # environmental data
+#'    env <- rast(system.file('ex/sample_env.tif', package="S4DM"))
 #'
-#' occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
-#'                                              new.world = TRUE,
-#'                                              cultivated = FALSE)
+#'  # rescale the environmental data
 #'
-#' # Thin down to unique occurrences
-#'
-#' occurrences <- unique(occurrences[c("longitude","latitude")])
-#'
-#' # Get bioclim data
-#'
-#' env <- worldclim_global(var = "bio",
-#'                         res = 10,
-#'                         path = temp)
-#'
-#'
-#' env <- env[[c(1,12)]]
-#'
+#'    env <- scale(env)
 #'
 #' env_pres <- get_env_pres(coords = occurrences,
 #'                         env = env)

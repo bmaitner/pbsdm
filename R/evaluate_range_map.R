@@ -25,31 +25,21 @@
 #' @export
 #' @examples{
 #'
+#'# load in sample data
 #'
-# load packages
-#'  library(geodata)
+#'  library(S4DM)
+#'  library(terra)
 #'
-#'# make temp directory
+#'  # occurrence points
+#'    data("sample_points")
+#'    occurrences <- sample_points
 #'
-#'  temp <- tempdir()
+#'  # environmental data
+#'    env <- rast(system.file('ex/sample_env.tif', package="S4DM"))
 #'
-#'# Get some occurrence data
+#'  # rescale the environmental data
 #'
-#'  occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
-#'                                               new.world = TRUE,
-#'                                               cultivated = FALSE)
-#'
-#'# Thin down to unique occurrences
-#'
-#'  occurrences <- unique(occurrences[c("longitude","latitude")])
-#'
-#'# Get bioclim data
-#'
-#'  env <- worldclim_global(var = "bio",
-#'                          res = 10,
-#'                          path = temp)
-#'
-#'  env <- env[[c(1,12)]]
+#'    env <- scale(env)
 #'
 #'# Evaluate a gaussian/gaussian model calculated with the numbag approach
 #'# using 10 bootstrap replicates.
@@ -63,7 +53,7 @@
 #'                     bootstrap_reps = 10,
 #'                     quantile = 0.05,
 #'                     constraint_regions = NULL,
-#'                     background_buffer_width = NULL)
+#'                     background_buffer_width = 100000)
 #'
 #'
 #'
