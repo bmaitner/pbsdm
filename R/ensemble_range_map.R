@@ -23,7 +23,7 @@
 #' @importFrom pROC roc auc
 #' @importFrom terra app nlyr ncell
 #' @export
-#' @examples {
+#' @examples \donttest{
 #'
 #'
 #'# load in sample data

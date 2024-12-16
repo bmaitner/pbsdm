@@ -59,41 +59,31 @@ Current density ratio methods include: "ulsif", "rulsif".
 Either \code{method} or both \code{presence_method} and \code{background_method} must be supplied.
 }
 \examples{
-{
-
-# load packages
- library(geodata)
-
- # make temp directory
-
- temp <- tempdir()
-
- # Get some occurrence data
-
- occurrences <- BIEN::BIEN_occurrence_species(species = "Trillium vaseyi",
-                                              new.world = TRUE,
-                                              cultivated = FALSE)
+\donttest{
 
 
- # Thin down to unique occurrences
- occurrences <- unique(occurrences[c("longitude","latitude")])
+# load in sample data
 
- # Get bioclim data
+ library(S4DM)
+ library(terra)
 
- env <- worldclim_global(var = "bio",
-                         res = 10,
-                         path = temp)
+ # occurrence points
+   data("sample_points")
+   occurrences <- sample_points
 
+ # environmental data
+   env <- rast(system.file('ex/sample_env.tif', package="S4DM"))
 
- env <- env[[c(1,12)]]
+ # rescale the environmental data
 
- ensemble <- ensemble_range_map(occurrences = occurrences,
-                                env = env,
-                                method = NULL,
-                                presence_method = c("gaussian", "rangebagging"),
-                                background_method = "gaussian",
-                                bootstrap = "numbag",
-                                bootstrap_reps = 10,
-                                quantile = 0.05)
+   env <- scale(env)
+
+ensemble <- ensemble_range_map(occurrences = occurrences,
+                               env = env,
+                               method = NULL,
+                               presence_method = c("gaussian", "kde"),
+                               background_method = "gaussian",
+                               quantile = 0.05,
+                               background_buffer_width = 100000  )
 }
 }
