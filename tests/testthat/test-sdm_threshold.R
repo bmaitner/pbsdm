@@ -15,7 +15,7 @@ test_that("sdm_threshold makes rasters binary", {
 
   # rescale the environmental data
 
-    env <- scale(env)
+    env <- terra::scale(env) #breaks testthat if this isn't done
 
    bg_data <- get_env_bg(coords = occurrences,
                          env = env,
