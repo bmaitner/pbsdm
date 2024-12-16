@@ -33,5 +33,4 @@ test_that("fit_ and project_density_ratio return correct format", {
 
   expect_equal(object = length(out2),expected = nrow(bg$env))
 
-
 })

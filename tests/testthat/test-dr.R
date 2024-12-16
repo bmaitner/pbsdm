@@ -107,5 +107,6 @@ test_that("rulsif returns correct format", {
 
   expect_equal(object = length(out2),expected = nrow(bg$env))
 
+
 })
 

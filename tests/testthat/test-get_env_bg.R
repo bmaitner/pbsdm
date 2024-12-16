@@ -22,5 +22,4 @@ test_that("get_env_bg returns correct format", {
 
   expect_equal(object = length(out),expected = 4)
 
-
 })

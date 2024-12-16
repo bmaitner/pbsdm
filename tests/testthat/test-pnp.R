@@ -210,4 +210,5 @@ test_that("none returns correct format", {
 
   expect_equal(object = length(out2),expected = 0)
 
+
 })

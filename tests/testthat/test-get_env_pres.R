@@ -80,5 +80,4 @@ test_that("get_env_pres doesn't rescale when not intended", {
 
   expect_gt(object = mean(out$env[,1]),expected = 10)
 
-
 })
