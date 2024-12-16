@@ -10,7 +10,6 @@
 #' @param envSDs A vector of standard deviations for each environmental predictor in the dataset.(not used)
 #'
 #' @return This function generates a set of marginal predictions for each environmental variable, holding other variables constant
-#' @export
 #' @author Cory Merow, modified by Brian Maitner
 #' @importFrom stats approx density
 #' @importFrom dplyr bind_rows
